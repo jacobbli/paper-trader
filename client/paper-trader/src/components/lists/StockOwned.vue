@@ -11,30 +11,60 @@
         <td>{{stock.symbol}}</td>
         <td>{{stock.price}}</td>
         <td>{{stock.quantity}}</td>
-        <td><button @click='incrementStock(stock)'>Buy</button></td>
+        <td><button @click='buyStock(stock)'>Buy</button></td>
+        <td><button @click='sellStock(stock)'>Sell</button></td>
       </tr>
     </table>
+    <quantity-selector 
+      v-if=showQuantitySelector
+      :stock=stockToPass
+      @close=closeQuantitySelector
+    ></quantity-selector>
   </div>
 </template>
 
 <script>
   import { mapGetters } from 'vuex'
+  import QuantitySelector from '../modal/QuantitySelector.vue'
+  import {getOwnedStocks} from '../../api/Api.js'
 
   export default {
     name: 'StockOwned',
+    components: {
+      QuantitySelector
+    },
+
     data() {
       return{
+        showQuantitySelector: false,
+        stockToPass: {}
       }
     },
+
     mounted() {
-      this.$store.dispatch('getOwnedStocks')
+      getOwnedStocks()
     },
+
     computed: {
         ...mapGetters({stocksOwned:'displayOwnedStocks'})
     },
+    
     methods: {
-      incrementStock(stock) {
-        return this.$store.dispatch('purchase', stock)
+      buyStock(stock) {
+        this.stockToPass = stock
+        this.openQuantitySelector()
+      },
+
+      sellStock(stock) {
+        return this.$store.dispatch('sell', stock)
+      },
+
+      openQuantitySelector(){
+        this.showQuantitySelector = true
+      },
+
+      closeQuantitySelector(){
+        this.showQuantitySelector = false
       },
     }
   }

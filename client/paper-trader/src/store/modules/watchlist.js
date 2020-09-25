@@ -1,5 +1,4 @@
 import Vue from 'vue'
-import axios from "axios";
 
 export default {
   state: {
@@ -13,8 +12,8 @@ export default {
   },
   
   mutations: {
-    getWatchlist(state, list){
-      state.watchlist = list
+    getWatchlist(state, watchList){
+      state.watchlist = watchList
     },
 
     addToWatchlist(state, stock) {
@@ -25,22 +24,14 @@ export default {
     },
 
     removeFromWatchlist(state, stock) {
-      // state.watchlist.pop(stock)
       var newList = state.watchlist.filter( item => item.symbol !== stock.symbol)
       state.watchlist = newList
     }
   },
   
   actions: {
-    getWatchlist(context){
-      axios({
-        method: "GET", 
-        url: `${process.env.VUE_APP_API_URL}get-watchlist/${process.env.VUE_APP_TEST_USER}`
-      }).then(result => {
-        context.commit('getWatchlist', result.data)
-      }, error => {
-        console.error(error);
-      })
+    getWatchlist(context, watchList){
+      context.commit('getWatchlist', watchList)
     },
 
     addToWatchlist(context, stock){

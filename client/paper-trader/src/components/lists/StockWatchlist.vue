@@ -9,36 +9,61 @@
       <tr v-for="stock in watchlist" :key=stock.symbol>
         <td>{{stock.symbol}}</td>
         <td>{{stock.price}}</td>
-        <td><button @click='purchaseStock(stock)'>Buy</button></td>
+        <td><button @click='buyStock(stock)'>Buy</button></td>
         <td><button @click='removeFromWatchlist(stock)'>Remove from watchlist</button></td>
       </tr>
     </table>
+    <quantity-selector 
+      v-if=showQuantitySelector
+      :stock=stockToPass
+      @close=closeQuantitySelector
+    ></quantity-selector>
   </div>
 </template>
 
 <script>
   import { mapGetters } from 'vuex'
+  import QuantitySelector from '../modal/QuantitySelector.vue'
+  import { getWatchlist } from '../../api/Api.js'
 
   export default {
     name: 'StockWatchlist',
+    components: {
+      QuantitySelector
+    },
+
     data() {
       return{
+        showQuantitySelector: false,
+        stockToPass: {}
       }
     },
+
     mounted() {
-        this.$store.dispatch('getWatchlist')
+        getWatchlist()
     },
+
     computed: {
         ...mapGetters({watchlist:'displayWatchlist'})
     },
+
     methods: {
-      purchaseStock(stock) {
-        return this.$store.dispatch('purchase', stock)
+      buyStock(stock) {
+        this.stockToPass = stock
+        this.openQuantitySelector()
       },
 
       removeFromWatchlist(stock) {
         return this.$store.dispatch('removeFromWatchlist', stock)
-      }
+      },
+      
+      openQuantitySelector(){
+        this.showQuantitySelector = true
+      },
+
+      closeQuantitySelector(){
+        this.showQuantitySelector = false
+      },
     }
   }
 </script>

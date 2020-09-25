@@ -17,47 +17,31 @@
     </div>
     <div 
       class='search-results'
-      v-if="resultsLength"
     >
-      <the-searchbar-results :results=searchResults></the-searchbar-results>
+      <the-searchbar-results></the-searchbar-results>
     </div>
   </div>
 </template>
 
 <script>
-  import axios from 'axios';
   import TheSearchbarResults from './TheSearchbarResults.vue'
-
-export default {
-  name: 'TheSearchbar',
-  components:{
-      TheSearchbarResults
-  },
-  data() {
-    return {
-      searchQuery: '',
-      searchResults: []
-    }
-  },
-  methods: {
-    searchForStock(){
-      axios({
-        method: 'GET', 
-        url: `${process.env.VUE_APP_API_URL}search-stocks/${this.searchQuery}`
-        }).then(result => {
-        this.searchResults=result.data
-      }, error => {
-        console.error(error);
-      })
-    }
-  },
-
-  computed: {
-    resultsLength(){
-      return this.searchResults.length > 0
-    }
+  import { searchForStock } from '../../api/Api.js'
+  export default {
+    name: 'TheSearchbar',
+    components:{
+        TheSearchbarResults
+    },
+    data() {
+      return {
+        searchQuery: '',
+      }
+    },
+    methods: {
+      searchForStock() {
+          searchForStock(this.searchQuery)
+      }
+    },
   }
-}
 </script>
 
 <!-- Add 'scoped' attribute to limit CSS to this component only -->

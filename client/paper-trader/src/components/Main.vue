@@ -1,7 +1,13 @@
 <template>
   <div class='main grid-container'>
-    <h1 class='grid-item'>Paper Trader</h1>
-    <base-dashboard class='grid-item'></base-dashboard>
+    <div class='grid-item1'>
+      <header>
+        <h1 >Paper Trader</h1>
+      </header>
+    </div>
+    <div class='grid-item2'>
+      <base-dashboard id='dashboard' ></base-dashboard>
+    </div>
   </div>
 </template>
 
@@ -20,20 +26,27 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .grid-container {
+  max-width: 100%;
   display:grid;
+  background-color: #2196F3;
+  grid-gap: 10px;
+  padding: 10px;
+  grid-template-areas:
+  'header'
+  'dashboard';
 }
-h3 {
-  margin: 40px 0 0;
+
+.main > div {
+  max-width: 100%;
+  padding: 20px;
+  background-color: rgba(255, 255, 255, .8);
 }
-ul {
-  list-style-type: none;
-  padding: 0;
+
+.grid-item1 {
+  grid-area: header;
 }
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
+
+.grid-item2 {
+  grid-area: dashboard;
 }
 </style>
