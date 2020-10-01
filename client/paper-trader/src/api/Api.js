@@ -33,3 +33,35 @@ export function searchForStock(searchQuery){
     console.error(error);
   })
 }
+
+export function buySecurity(security, price, quantity){
+  axios.post(
+    `${process.env.VUE_APP_API_URL}buy/${process.env.VUE_APP_TEST_USER}`,
+    null,
+    { 'params': {
+        'symbol': security,
+        'quantity': quantity,
+        'price': price
+      }
+    }
+  ).then(() => {
+    store.dispatch('buy', {symbol: security, price: price, quantity: quantity})  }, error => {
+    console.error(error);
+  })
+}
+
+export function sellSecurity(security, price, sellQuantity){
+  axios.post(
+    `${process.env.VUE_APP_API_URL}sell/${process.env.VUE_APP_TEST_USER}`,
+    null,
+    { 'params': {
+        'symbol': security,
+        'sell_quantity': sellQuantity,
+        'price': price
+      }
+    }
+  ).then(() => {
+    store.dispatch('sell', {symbol: security, price: price, sell_quantity: sellQuantity})  }, error => {
+    console.error(error);
+  })
+}

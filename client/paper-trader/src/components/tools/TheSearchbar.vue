@@ -18,7 +18,7 @@
     <div 
       class='search-results'
     >
-      <the-searchbar-results></the-searchbar-results>
+      <the-searchbar-results :firstPage="0"></the-searchbar-results>
     </div>
   </div>
 </template>

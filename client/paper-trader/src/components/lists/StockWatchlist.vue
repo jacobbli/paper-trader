@@ -6,16 +6,19 @@
         <th>Stock Symbol</th>
         <th>Purchase Price</th>
       </tr>
-      <tr v-for="stock in watchlist" :key=stock.symbol>
-        <td>{{stock.symbol}}</td>
-        <td>{{stock.price}}</td>
-        <td><button @click='buyStock(stock)'>Buy</button></td>
+      <tr v-for="(value, name) in watchlist" :key='name'>
+        <td>{{name}}</td>
+        <td>{{value}}</td>
+        <td><button @click='buyStock(name, value)'>Buy</button></td>
         <td><button @click='removeFromWatchlist(stock)'>Remove from watchlist</button></td>
       </tr>
     </table>
     <quantity-selector 
       v-if=showQuantitySelector
       :stock=stockToPass
+      :price=priceToPass
+      :ownedQuantity="ownedQuantity"
+      :action="action"      
       @close=closeQuantitySelector
     ></quantity-selector>
   </div>
@@ -35,7 +38,10 @@
     data() {
       return{
         showQuantitySelector: false,
-        stockToPass: {}
+        stockToPass: String,
+        priceToPass: Number,
+        ownedQuantity: 0,
+        action: String
       }
     },
 
@@ -48,8 +54,10 @@
     },
 
     methods: {
-      buyStock(stock) {
+      buyStock(stock, price) {
         this.stockToPass = stock
+        this.priceToPass = price
+        this.action = 'buy'
         this.openQuantitySelector()
       },
 

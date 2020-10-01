@@ -3,21 +3,24 @@
     <h2>Owned Stocks</h2>
     <table>
       <tr>
-        <th>Stock Symbol</th>
         <th>Purchase Price</th>
+        <th>Stock Symbol</th>
         <th>Quantity</th>
       </tr>
-      <tr v-for="stock in stocksOwned" :key='stock.symbol'>
-        <td>{{stock.symbol}}</td>
-        <td>{{stock.price}}</td>
-        <td>{{stock.quantity}}</td>
-        <td><button @click='buyStock(stock)'>Buy</button></td>
-        <td><button @click='sellStock(stock)'>Sell</button></td>
+      <tr v-for="(value, name) in stocksOwned" :key='name'>
+        <td>{{name}}</td>
+        <td>{{value[0]}}</td>
+        <td>{{value[1]}}</td>
+        <td><button @click='buyStock(name, value[1])'>Buy</button></td>
+        <td><button @click='sellStock(name, value[0], value[1])'>Sell</button></td>
       </tr>
     </table>
     <quantity-selector 
       v-if=showQuantitySelector
-      :stock=stockToPass
+      :stock="stockToPass"
+      :price="priceToPass"
+      :ownedQuantity="ownedQuantity"
+      :action="action"
       @close=closeQuantitySelector
     ></quantity-selector>
   </div>
@@ -37,7 +40,10 @@
     data() {
       return{
         showQuantitySelector: false,
-        stockToPass: {}
+        stockToPass: {},
+        priceToPass: Number,
+        ownedQuantity: 0,
+        action: String
       }
     },
 
@@ -50,13 +56,19 @@
     },
     
     methods: {
-      buyStock(stock) {
+      buyStock(stock, price) {
         this.stockToPass = stock
+        this.priceToPass = price
+        this.action = 'buy'
         this.openQuantitySelector()
       },
 
-      sellStock(stock) {
-        return this.$store.dispatch('sell', stock)
+      sellStock(stock, ownedQuantity, price) {
+        this.stockToPass = stock
+        this.priceToPass = price
+        this.ownedQuantity = ownedQuantity
+        this.action = 'sell'
+        this.openQuantitySelector()
       },
 
       openQuantitySelector(){

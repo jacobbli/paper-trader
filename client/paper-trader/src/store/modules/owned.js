@@ -17,24 +17,20 @@ export default {
     },
 
     addStock(state, payload) {
-      var newStock = {};
-      Vue.set(newStock, 'symbol', payload.stock.symbol)
-      Vue.set(newStock, 'price', payload.stock.price)
-      Vue.set(newStock, 'quantity', parseInt(payload.quantity))
-      state.owned.push(newStock)
+      Vue.set(state.owned, payload.symbol, [parseInt(payload.quantity), payload.price])
     },
 
-    removeStock(state, stock) {
-      var newList = state.owned.filter( item => item.symbol !== stock.symbol)
-      state.owned = newList
+    removeStock(state, payload) {
+      Vue.delete(state.owned, payload.symbol)
     },
 
     incrementQuantity(state, payload) {
-      payload.stock.quantity += parseInt(payload.quantity)
+      var newQuantity = state.owned[payload.symbol][0] += parseInt(payload.quantity)
+      Vue.set(state.owned, payload.symbol, [newQuantity, payload.price])
     },
 
-    decrementQuantity(state, stock) {
-      stock.quantity--
+    decrementQuantity(state, payload) {
+      Vue.set(state.owned, payload.symbol, [payload.new_quantity, payload.price])
     }
   },
   
@@ -44,34 +40,37 @@ export default {
     },
 
     buy(context, payload) {
-      context.dispatch('stockAlreadyOwned', payload.stock.symbol).then( result => {
+      context.dispatch('stockAlreadyOwned', payload.symbol).then( result => {
         if(result===false) {
           context.commit('addStock', payload)
         } else {
-          context.dispatch('findOwnedStock', payload.stock.symbol).then( result => {
-            context.commit('incrementQuantity', {stock: result, quantity: payload.quantity})
-          })
+          context.commit('incrementQuantity', payload)
         }
       })
     },
 
-    stockAlreadyOwned(context, symbol) {
-      return context.state.owned.filter( function (item) { return item.symbol == symbol }).length > 0
-    },
+    sell(context, payload) {
+      var originalQuantity = context.state.owned[payload.symbol][0]
+      var newQuantity = originalQuantity - payload.sell_quantity
 
-    findOwnedStock(context, symbol){
-      return context.state.owned.find( 
-        function (item) { return item.symbol == symbol })
-    },
-
-    sell(context, stock) {
-      if(stock.quantity <= 1) {
-        context.commit('removeStock', stock)
+      if(newQuantity == 0) {
+        context.commit('removeStock', payload)
       } else {
-        context.commit('decrementQuantity', stock)
+        payload = {
+          'symbol': payload.symbol,
+          'new_quantity': newQuantity,
+          'price': payload.price
+        }
+        context.commit('decrementQuantity', payload)
       }
-      
+    },
 
+    stockAlreadyOwned(context, symbol) {
+      var security_exists = false
+      if(Object.keys(context.state.owned).includes(symbol)) {
+        security_exists = true
+      }
+      return security_exists
     }
   }
 };
