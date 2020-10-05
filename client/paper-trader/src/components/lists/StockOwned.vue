@@ -29,7 +29,7 @@
 <script>
   import { mapGetters } from 'vuex'
   import QuantitySelector from '../modal/QuantitySelector.vue'
-  import {getOwnedStocks} from '../../api/Api.js'
+  import {getOwnedStocks} from '../../api/StockApi.js'
 
   export default {
     name: 'StockOwned',

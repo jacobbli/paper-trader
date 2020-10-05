@@ -25,7 +25,7 @@
 
 <script>
   import TheSearchbarResults from './TheSearchbarResults.vue'
-  import { searchForStock } from '../../api/Api.js'
+  import { searchForStock } from '../../api/StockApi.js'
   export default {
     name: 'TheSearchbar',
     components:{

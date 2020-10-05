@@ -27,7 +27,7 @@
 <script>
   import { mapGetters } from 'vuex'
   import QuantitySelector from '../modal/QuantitySelector.vue'
-  import { getWatchlist } from '../../api/Api.js'
+  import { getWatchlist } from '../../api/StockApi.js'
 
   export default {
     name: 'StockWatchlist',
