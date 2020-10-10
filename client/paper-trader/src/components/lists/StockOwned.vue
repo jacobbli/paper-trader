@@ -11,11 +11,12 @@
         <td>{{name}}</td>
         <td>{{value[0]}}</td>
         <td>{{value[1]}}</td>
-        <td><button @click='buyStock(name, value[1])'>Buy</button></td>
-        <td><button @click='sellStock(name, value[0], value[1])'>Sell</button></td>
+        <td><a-button type="primary" @click='buyStock(name, value[1])'>Buy</a-button></td>
+        <td><a-button @click='sellStock(name, value[0], value[1])'>Sell</a-button></td>
       </tr>
     </table>
     <quantity-selector 
+      style="z-index: 100"
       v-if=showQuantitySelector
       :stock="stockToPass"
       :price="priceToPass"
@@ -29,7 +30,7 @@
 <script>
   import { mapGetters } from 'vuex'
   import QuantitySelector from '../modal/QuantitySelector.vue'
-  import {getOwnedStocks} from '../../api/StockApi.js'
+  import {getOwnedStocks} from '../../api/SecuritiesApi.js'
 
   export default {
     name: 'StockOwned',

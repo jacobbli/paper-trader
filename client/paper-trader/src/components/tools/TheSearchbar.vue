@@ -2,7 +2,7 @@
 <div class='search-tool'>
   <div class='searchbar'>
     <form>
-      <label for='stocks'>Enter a company name or ticker symbol:</label><br>
+      <label for='stocks'>Enter a ticker symbol:</label><br>
       <input 
         type='text' 
         id='stock' 
@@ -25,7 +25,7 @@
 
 <script>
   import TheSearchbarResults from './TheSearchbarResults.vue'
-  import { searchForStock } from '../../api/StockApi.js'
+  import { searchForStock } from '../../api/SecuritiesApi.js'
   export default {
     name: 'TheSearchbar',
     components:{

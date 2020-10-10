@@ -41,8 +41,8 @@
 </template>
 
 <script>
-  import { buySecurity } from '../../api/StockApi.js'
-  import { sellSecurity } from '../../api/StockApi.js'
+  import { buySecurity } from '../../api/SecuritiesApi.js'
+  import { sellSecurity } from '../../api/SecuritiesApi.js'
 
   export default {
     name: 'QuantitySelector',

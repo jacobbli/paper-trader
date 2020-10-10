@@ -35,6 +35,7 @@ export default {
     },
 
     addToWatchlist(context, stock){
+      console.log(stock)
       context.dispatch('stockAlreadyInWatchlist', stock.symbol).then( result => {
         if(result===false) {
           context.commit('addToWatchlist', stock)
@@ -43,7 +44,11 @@ export default {
     },
     
     stockAlreadyInWatchlist(context, symbol) {
-      return context.state.watchlist.filter( function (item) { return item.symbol == symbol }).length > 0
+      var security_exists = false
+      if(Object.keys(context.state.watchlist).includes(symbol)) {
+        security_exists = true
+      }
+      return security_exists
     },
 
     removeFromWatchlist(context,stock) {

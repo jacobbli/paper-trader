@@ -13,8 +13,8 @@
           <td>{{stock.name}}</td>
           <td>{{stock.exchange}}</td>
           <td>${{stock.price}}</td>
-          <td><button @click='buyStock(stock)'>Buy</button></td>
-          <td><button @click='addToWatchlist(stock)'>Add to watchlist</button></td>
+          <td><a-button type="primary" @click='buyStock(stock)'>Buy</a-button></td>
+          <td><a-button @click='addToWatchlist(stock)'>Add to watchlist</a-button></td>
       </tr>
     </table>
     <footer class='page-number'>
@@ -37,8 +37,11 @@
       </button>
     </footer>
     <quantity-selector 
+      style="z-index: 100"
       v-if=showQuantitySelector
       :stock=stockToPass
+      :price="priceToPass"
+      :action="action"
       @close=closeQuantitySelector
     ></quantity-selector>
   </div>

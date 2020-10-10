@@ -1,19 +1,30 @@
 <template>
-  <div class='watchlist'>
+  <div class="watchlist">
     <h2>Watchlist</h2>
     <table>
       <tr>
         <th>Stock Symbol</th>
         <th>Purchase Price</th>
       </tr>
-      <tr v-for="(value, name) in watchlist" :key='name'>
+      <tr v-for="(value, name) in watchlist" :key="name">
         <td>{{name}}</td>
         <td>{{value}}</td>
-        <td><button @click='buyStock(name, value)'>Buy</button></td>
-        <td><button @click='removeFromWatchlist(stock)'>Remove from watchlist</button></td>
+        <td><a-button type="primary" @click="buyStock(name, value)">Buy</a-button></td>
+        <td>
+          <a-popconfirm
+            title="Remove from watchlist?"
+            ok-text="Yes"
+            cancel-text="No"
+            @confirm="confirm"
+            @cancel="cancel"
+          >
+            <a-button @click="removeFromWatchlist(stock)">Remove from watchlist</a-button>
+          </a-popconfirm>
+        </td>
       </tr>
     </table>
     <quantity-selector 
+      style="z-index: 100"
       v-if=showQuantitySelector
       :stock=stockToPass
       :price=priceToPass
@@ -27,7 +38,7 @@
 <script>
   import { mapGetters } from 'vuex'
   import QuantitySelector from '../modal/QuantitySelector.vue'
-  import { getWatchlist } from '../../api/StockApi.js'
+  import { getWatchlist } from '../../api/SecuritiesApi.js'
 
   export default {
     name: 'StockWatchlist',
