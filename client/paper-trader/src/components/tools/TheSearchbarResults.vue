@@ -13,8 +13,8 @@
           <td>{{stock.name}}</td>
           <td>{{stock.exchange}}</td>
           <td>${{stock.price}}</td>
-          <td><button @click='buyStock(stock)'>Buy</button></td>
-          <td><button @click='addToWatchlist(stock)'>Add to watchlist</button></td>
+          <td><a-button type="primary" @click='buyStock(stock)'>Buy</a-button></td>
+          <td><a-button @click='addToWatchlist(stock)'>Add to watchlist</a-button></td>
       </tr>
     </table>
     <footer class='page-number'>
@@ -29,14 +29,19 @@
       <button 
         class='next-page'
         v-if='showNextPageButton'
+        :ownedQuantity="ownedQuantity"
+        :action="action"      
         @click='currentPage++'
       >
       &gt;
       </button>
     </footer>
     <quantity-selector 
+      style="z-index: 100"
       v-if=showQuantitySelector
       :stock=stockToPass
+      :price="priceToPass"
+      :action="action"
       @close=closeQuantitySelector
     ></quantity-selector>
   </div>
@@ -54,20 +59,26 @@
     },
 
     props: {
-      results: Array
+      firstPage: Number
     },
 
     data() {
       return{
         showQuantitySelector: false,
-        stockToPass: {},
-        currentPage: 0,
+        stockToPass: String,
+        priceToPass: Number,
         resultsPerPage: 5,
+        currentPage: this.firstPage,
+        ownedQuantity: 0,
+        action: String
       }
     },
 
     computed: {
-      ...mapGetters({allResults:'displayResults'}),
+      ...mapGetters({
+        allResults:'displayResults'
+      
+      }),
 
       dividedResults: function() {
         var array = []
@@ -93,7 +104,7 @@
         }
       },
       showNextPageButton: function() {
-        if (this.currentPage === this.totalPages){
+        if (this.currentPage === this.totalPages-1){
           return false;
         } else {
           return true;
@@ -107,7 +118,10 @@
 
     methods: {
       buyStock(stock) {
-        this.stockToPass = stock
+        console.log(stock)
+        this.stockToPass = stock.symbol
+        this.priceToPass = stock.price
+        this.action = 'buy'
         this.openQuantitySelector()
       },
 
@@ -123,6 +137,12 @@
         this.showQuantitySelector = false
       },
     },
+
+    watch: {
+      allResults: function () {
+        this.currentPage = 0;
+      }
+    }
   }
 </script>
 

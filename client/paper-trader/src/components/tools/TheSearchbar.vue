@@ -2,7 +2,7 @@
 <div class='search-tool'>
   <div class='searchbar'>
     <form>
-      <label for='stocks'>Enter a company name or ticker symbol:</label><br>
+      <label for='stocks'>Enter a ticker symbol:</label><br>
       <input 
         type='text' 
         id='stock' 
@@ -18,14 +18,14 @@
     <div 
       class='search-results'
     >
-      <the-searchbar-results></the-searchbar-results>
+      <the-searchbar-results :firstPage="0"></the-searchbar-results>
     </div>
   </div>
 </template>
 
 <script>
   import TheSearchbarResults from './TheSearchbarResults.vue'
-  import { searchForStock } from '../../api/Api.js'
+  import { searchForStock } from '../../api/SecuritiesApi.js'
   export default {
     name: 'TheSearchbar',
     components:{

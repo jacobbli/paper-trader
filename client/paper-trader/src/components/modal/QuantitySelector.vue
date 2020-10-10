@@ -2,7 +2,7 @@
   <div class="modal-backdrop">
     <div class="modal">
       <header class="modal-header">
-        <h1 class="heading">Choose the number of shares</h1>
+        <h1 class="heading">{{ headingMessage }}</h1>
         <button
           type="button"
           class="btn-close"
@@ -17,16 +17,16 @@
           type="number" 
           min=0
           v-model='quantity'
-          @keyup.enter='buyStock'
+          @keyup.enter='placeOrder'
         > shares
       </section>
       <footer class="modal-footer">
         <button
           type="button"
           class="btn-green"
-          @click="buyStock"
+          @click="placeOrder"
         >
-        Buy stock
+        Place order
         </button>
         <button
           type="button"
@@ -41,17 +41,34 @@
 </template>
 
 <script>
+  import { buySecurity } from '../../api/SecuritiesApi.js'
+  import { sellSecurity } from '../../api/SecuritiesApi.js'
 
   export default {
     name: 'QuantitySelector',
     props:{
-      stock: Object,
+      stock: String,
+      price: Number,
+      ownedQuantity: Number,
+      action: String
     },
 
     data() {
       return{
-        quantity: 0
+        quantity: 0,
+        oversellMessage: ''
       }
+    },
+
+    computed:{
+      headingMessage: function() {
+        if (this.action == 'buy') {
+          return 'Choose the number of shares to buy'
+        } else if (this.action == 'sell') {
+          return 'Choose the number of shares to sell'
+        }
+        return ''
+      } 
     },
 
     methods: {
@@ -59,12 +76,31 @@
         this.$emit('close');
       },
 
+      placeOrder() {
+        if (this.action == 'buy') {
+          this.buyStock()
+        } else if (this.action == 'sell') {
+          if (this.quantity > this.ownedQuantity) {
+            this.oversellMessage = 'You cannot sell more than what you own!'
+          } else {
+            this.sellStock()
+          }
+        }
+      },
+
       buyStock() {
         if(this.quantity > 0) {
-          this.$store.dispatch('buy', {stock: this.stock, quantity: this.quantity})
+          buySecurity(this.stock, this.price, this.quantity)
         }
         this.close()
-      }
+      },
+
+      sellStock() {
+        if (this.quantity > 0) {
+          sellSecurity(this.stock, this.price, this.quantity)
+        }
+        this.close()
+      },
     }
   }
 </script>
