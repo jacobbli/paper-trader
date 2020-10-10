@@ -11,6 +11,7 @@ export default {
   
   mutations: {
     getSearchResults(state, searchResults){
+      console.log(searchResults)
       state.searchResults = searchResults
     },
   },

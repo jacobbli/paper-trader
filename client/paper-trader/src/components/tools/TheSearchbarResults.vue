@@ -8,11 +8,11 @@
           <th>Exchange</th>
           <th>Price</th>
         </tr>
-        <tr v-for="stock in resultsToDisplay" :key=stock.symbol>
-          <td>{{stock.symbol}}</td>
-          <td>{{stock.name}}</td>
-          <td>{{stock.exchange}}</td>
-          <td>${{stock.price}}</td>
+        <tr v-for="stock in resultsToDisplay" :key="stock[0]">
+          <td>{{stock[0]}}</td>
+          <td>{{stock[1]}}</td>
+          <td>{{stock[3]}}</td>
+          <td>${{stock[2]}}</td>
           <td><a-button type="primary" @click='buyStock(stock)'>Buy</a-button></td>
           <td><a-button @click='addToWatchlist(stock)'>Add to watchlist</a-button></td>
       </tr>
@@ -77,7 +77,6 @@
     computed: {
       ...mapGetters({
         allResults:'displayResults'
-      
       }),
 
       dividedResults: function() {
