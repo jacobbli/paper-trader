@@ -2,7 +2,7 @@ import Vue from 'vue'
 
 export default {
   state: {
-    owned: [],
+    owned: {},
   },
   
   getters: {
@@ -17,7 +17,7 @@ export default {
     },
 
     addStock(state, payload) {
-      Vue.set(state.owned, payload.symbol, [parseInt(payload.quantity), payload.price])
+      Vue.set(state.owned, payload.symbol, [payload.price, parseInt(payload.quantity), payload.exchange_name])
     },
 
     removeStock(state, payload) {
@@ -25,12 +25,14 @@ export default {
     },
 
     incrementQuantity(state, payload) {
-      var newQuantity = state.owned[payload.symbol][0] += parseInt(payload.quantity)
-      Vue.set(state.owned, payload.symbol, [newQuantity, payload.price])
+      var newQuantity = state.owned[payload.symbol][1] + parseInt(payload.quantity)
+      var totalValue = state.owned[payload.symbol][0]*state.owned[payload.symbol][1] + payload.price*parseInt(payload.quantity)
+      var unitValue = totalValue / newQuantity
+      Vue.set(state.owned, payload.symbol, [unitValue, newQuantity, payload.exchange_name])
     },
 
     decrementQuantity(state, payload) {
-      Vue.set(state.owned, payload.symbol, [payload.new_quantity, payload.price])
+      Vue.set(state.owned, payload.symbol, [payload.price, payload.new_quantity, payload.exchange_name])
     }
   },
   
@@ -50,16 +52,16 @@ export default {
     },
 
     sell(context, payload) {
-      var originalQuantity = context.state.owned[payload.symbol][0]
+      var originalQuantity = context.state.owned[payload.symbol][1]
       var newQuantity = originalQuantity - payload.sell_quantity
-
       if(newQuantity == 0) {
         context.commit('removeStock', payload)
       } else {
         payload = {
           'symbol': payload.symbol,
           'new_quantity': newQuantity,
-          'price': payload.price
+          'price': payload.price,
+          'exchange_name': payload.exchange_name
         }
         context.commit('decrementQuantity', payload)
       }

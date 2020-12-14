@@ -8,13 +8,13 @@
           <th>Exchange</th>
           <th>Price</th>
         </tr>
-        <tr v-for="stock in resultsToDisplay" :key=stock.symbol>
-          <td>{{stock.symbol}}</td>
-          <td>{{stock.name}}</td>
-          <td>{{stock.exchange}}</td>
-          <td>${{stock.price}}</td>
-          <td><a-button type="primary" @click='buyStock(stock)'>Buy</a-button></td>
-          <td><a-button @click='addToWatchlist(stock)'>Add to watchlist</a-button></td>
+        <tr v-for="stock in resultsToDisplay" :key="stock[0]">
+          <td>{{stock[0]}}</td>
+          <td>{{stock[1]}}</td>
+          <td>{{stock[3]}}</td>
+          <td>${{stock[2]}}</td>
+          <td><a-button type="primary" @click='buyStock(stock[0], stock[2], stock[3])'>Buy</a-button></td>
+          <td><a-button @click='addToWatchlist(stock[0], stock[2], stock[3] )'>Add to watchlist</a-button></td>
       </tr>
     </table>
     <footer class='page-number'>
@@ -41,6 +41,7 @@
       v-if=showQuantitySelector
       :stock=stockToPass
       :price="priceToPass"
+      :exchangeName=exchangeNameToPass
       :action="action"
       @close=closeQuantitySelector
     ></quantity-selector>
@@ -50,6 +51,7 @@
 <script>
   import QuantitySelector from '../modal/QuantitySelector.vue'
   import { mapGetters } from 'vuex'
+  import { addToWatchlist } from '../../api/WatchlistApi.js'
 
   export default {
     
@@ -67,6 +69,7 @@
         showQuantitySelector: false,
         stockToPass: String,
         priceToPass: Number,
+        exchangeNameToPass: String,
         resultsPerPage: 5,
         currentPage: this.firstPage,
         ownedQuantity: 0,
@@ -77,7 +80,6 @@
     computed: {
       ...mapGetters({
         allResults:'displayResults'
-      
       }),
 
       dividedResults: function() {
@@ -117,16 +119,16 @@
     },
 
     methods: {
-      buyStock(stock) {
-        console.log(stock)
-        this.stockToPass = stock.symbol
-        this.priceToPass = stock.price
+      buyStock(stock, price, exchangeName) {
+        this.stockToPass = stock
+        this.priceToPass = price
+        this.exchangeNameToPass = exchangeName
         this.action = 'buy'
         this.openQuantitySelector()
       },
 
-      addToWatchlist(stock) {
-        return this.$store.dispatch('addToWatchlist', stock)
+      addToWatchlist(security, price, exchangeName) {
+        addToWatchlist(security, price, exchangeName)
       },
 
       openQuantitySelector() {

@@ -50,6 +50,7 @@
       stock: String,
       price: Number,
       ownedQuantity: Number,
+      exchangeName: String,
       action: String
     },
 
@@ -90,14 +91,16 @@
 
       buyStock() {
         if(this.quantity > 0) {
-          buySecurity(this.stock, this.price, this.quantity)
+          buySecurity(this.stock, this.price, this.quantity, this.exchangeName)
         }
         this.close()
       },
 
       sellStock() {
         if (this.quantity > 0) {
-          sellSecurity(this.stock, this.price, this.quantity)
+          if(this.quantity <= this.ownedQuantity) {
+            sellSecurity(this.stock, this.price, this.quantity, this.exchangeName)
+          }
         }
         this.close()
       },

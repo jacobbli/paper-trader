@@ -3,63 +3,46 @@ import re
 from fastapi.responses import JSONResponse
 
 from paper_trader.models import DocumentModel, SearchModel, UpdateModel, InsertModel
-from paper_trader.db.database import get_collection
+from paper_trader.db.database import get_cursor, commit_to_database
 from . import utils
 
 
-# def count_docs(document_model: DocumentModel):
-#     collection = get_collection(document_model)
-#     request = collection.count_documents(document_model.filter)
-    
-
-def get_doc(document_model: DocumentModel):
-    doc_list = []
-    collection = get_collection(document_model['collection_name'])
-    
-    request = collection.find(document_model['filter'], projection=document_model['projection'])
-    for item in request:
-        doc_list.append(item)
-    return doc_list
+def get_purchase_value(symbol, exchange):
+    db, db_cursor = get_cursor()
+    query = f"""
+        SELECT security_value
+        FROM public_securities
+        WHERE public_securities.security_symbol = '{symbol}' AND public_securities.exchange_name = '{exchange}'
+        """
+    db_cursor.execute(query)
+    result = db_cursor.fetchone()
+    result_float = float(result[0])
+    return result_float
 
 
-def search_docs(search_model: SearchModel):
-    doc_list = []
-    query_lower = search_model['search_term'].lower()
-    query_upper = search_model['search_term'].upper()
-    regex = re.compile(r'^.*('+query_lower + r')|('+query_upper+r').*')
-    filter = {'$or': [ {'symbol': {'$regex': regex}}, {'name': {'$regex': regex}} ] }
-    collection = get_collection(search_model['collection_name'])
-    results = collection.find(filter=filter, projection=search_model['projection'])
-    for item in results:
-        print(item)
-        doc_list.append(item)
-    return doc_list
+def search(search_term):
+    search_term_upper = search_term.upper()
 
-
-def update(update_model:UpdateModel):
-    collection = get_collection(update_model['collection_name'])
-    update = { '$set': update_model['content']}
-    request = collection.update_one(
-        update_model['filter'], 
-        update
-    )
-
-    result = {
-        'modified_count': request.modified_count,
-        'content': update_model['content']
-    }
+    db, db_cursor = get_cursor()
+    query = f"""
+        SELECT security_symbol, security_name, security_value, exchange_name
+        FROM public_securities
+        WHERE 
+            UPPER(public_securities.security_symbol) LIKE '%{search_term_upper}%' OR
+            UPPER(public_securities.security_name) LIKE '%{search_term_upper}%'
+        """
+    db_cursor.execute(query)
+    result = db_cursor.fetchall()
     return result
 
 
-def insert(insert_model:InsertModel):
-    collection = get_collection(insert_model['collection_name'])
 
-    request = collection.update_one(
-        insert_model.content
-    )
-
-    response = {
-        'modified_count': request.modified_count,
-        'content': insert_model.update
-    }
-    return JSONResponse(content=response)
+def insert_transaction(params):
+    db, db_cursor = get_cursor()
+    query = f"""
+        INSERT INTO transactions (user_name, security_symbol, exchange_name, price, quantity)
+        VALUES ('{params['user_name']}', '{params['security_symbol']}', '{params['exchange_name']}', {params['price']}, {params['quantity']})
+        """
+    db_cursor.execute(query)
+    commit_to_database(db, db_cursor)
+    return 
