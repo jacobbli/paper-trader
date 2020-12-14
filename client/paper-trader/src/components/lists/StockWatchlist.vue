@@ -6,19 +6,19 @@
         <th>Stock Symbol</th>
         <th>Purchase Price</th>
       </tr>
-      <tr v-for="(value, name) in watchlist" :key="name">
+      <tr v-for="(data, name) in watchlist" :key="name">
         <td>{{name}}</td>
-        <td>{{value}}</td>
-        <td><a-button type="primary" @click="buyStock(name, value)">Buy</a-button></td>
+        <td>${{data[0]}}</td>
+        <td><a-button type="primary" @click="buyStock(name, data[0], data[1])">Buy</a-button></td>
         <td>
           <a-popconfirm
             title="Remove from watchlist?"
             ok-text="Yes"
             cancel-text="No"
-            @confirm="confirm"
+            @confirm="removeFromWatchlist(name, data[1])"
             @cancel="cancel"
           >
-            <a-button @click="removeFromWatchlist(stock)">Remove from watchlist</a-button>
+            <a-button>Remove from watchlist</a-button>
           </a-popconfirm>
         </td>
       </tr>
@@ -28,6 +28,7 @@
       v-if=showQuantitySelector
       :stock=stockToPass
       :price=priceToPass
+      :exchangeName=exchangeNameToPass
       :ownedQuantity="ownedQuantity"
       :action="action"      
       @close=closeQuantitySelector
@@ -38,7 +39,7 @@
 <script>
   import { mapGetters } from 'vuex'
   import QuantitySelector from '../modal/QuantitySelector.vue'
-  import { getWatchlist } from '../../api/SecuritiesApi.js'
+  import { getWatchlist, removeSecurity } from '../../api/WatchlistApi.js'
 
   export default {
     name: 'StockWatchlist',
@@ -51,6 +52,7 @@
         showQuantitySelector: false,
         stockToPass: String,
         priceToPass: Number,
+        exchangeNameToPass: String,
         ownedQuantity: 0,
         action: String
       }
@@ -65,15 +67,16 @@
     },
 
     methods: {
-      buyStock(stock, price) {
+      buyStock(stock, price, exchangeName) {
         this.stockToPass = stock
         this.priceToPass = price
+        this.exchangeNameToPass = exchangeName
         this.action = 'buy'
         this.openQuantitySelector()
       },
 
-      removeFromWatchlist(stock) {
-        return this.$store.dispatch('removeFromWatchlist', stock)
+      removeFromWatchlist(stock, exchangeName) {
+        removeSecurity(stock, exchangeName)
       },
       
       openQuantitySelector(){
@@ -83,6 +86,11 @@
       closeQuantitySelector(){
         this.showQuantitySelector = false
       },
+
+      cancel(e){
+        console.log(e)
+        return;
+      }
     }
   }
 </script>

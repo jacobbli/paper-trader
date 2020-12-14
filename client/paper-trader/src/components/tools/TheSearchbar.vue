@@ -1,19 +1,13 @@
 <template>
-<div class='search-tool'>
-  <div class='searchbar'>
-    <form>
-      <label for='stocks'>Enter a ticker symbol:</label><br>
-      <input 
-        type='text' 
-        id='stock' 
-        name='stocks' 
-        v-model='searchQuery'
-      >
-      <input 
-        type='submit' 
-        @click.prevent=searchForStock()
-      >
-    </form>
+  <div class='search-tool'>
+    <div class='searchbar'>
+      <a-input-search
+        placeholder="Enter a ticker symbol"
+        enter-button="Search"
+        size="large"
+        style="width: 500px;"
+        @search="searchForStock"
+      />
     </div>
     <div 
       class='search-results'
@@ -31,14 +25,10 @@
     components:{
         TheSearchbarResults
     },
-    data() {
-      return {
-        searchQuery: '',
-      }
-    },
+
     methods: {
-      searchForStock() {
-          searchForStock(this.searchQuery)
+      searchForStock(value) {
+        searchForStock(value)
       }
     },
   }

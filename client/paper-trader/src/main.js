@@ -1,8 +1,9 @@
 import Vue from 'vue';
 import App from './App.vue';
 import store from './store/store'
-import { Button, Row, Col, Layout, Menu, Space, Popconfirm } from 'ant-design-vue';
+import { Button, Row, Col, Layout, Menu, Space, Popconfirm, Input} from 'ant-design-vue';
 import 'ant-design-vue/dist/antd.css';
+import { Form } from 'ant-design-vue';
 
 Vue.use(Button)
 Vue.use(Row)
@@ -11,7 +12,8 @@ Vue.use(Layout)
 Vue.use(Menu)
 Vue.use(Space)
 Vue.use(Popconfirm)
-
+Vue.use(Input)
+app.use(Form)
 
 Vue.config.productionTip = false
 
