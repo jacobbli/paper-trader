@@ -5,7 +5,7 @@ import store from '../store/store.js'
 export function getWatchlist() {
   axios({
     method: "GET", 
-    url: `${process.env.VUE_APP_API_URL}watchlist/get/${process.env.VUE_APP_TEST_USER}`
+    url: `${process.env.VUE_APP_API_URL}/watchlist/get/${process.env.VUE_APP_TEST_USER}`
   }).then(result => {
     store.dispatch('getWatchlist', result.data)
   }, error => {
@@ -16,7 +16,7 @@ export function getWatchlist() {
 
 export function addToWatchlist(security, price, exchangeName){
   axios.post(
-    `${process.env.VUE_APP_API_URL}watchlist/add/${process.env.VUE_APP_TEST_USER}`,
+    `${process.env.VUE_APP_API_URL}/watchlist/add/${process.env.VUE_APP_TEST_USER}`,
     null,
     { 'params': {
         'symbol': security,
@@ -32,7 +32,7 @@ export function addToWatchlist(security, price, exchangeName){
 
 export function removeSecurity(security, exchangeName){
   axios.post(
-    `${process.env.VUE_APP_API_URL}watchlist/delete/${process.env.VUE_APP_TEST_USER}`,
+    `${process.env.VUE_APP_API_URL}/watchlist/delete/${process.env.VUE_APP_TEST_USER}`,
     null,
     { 'params': {
         'symbol': security,

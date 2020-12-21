@@ -4,7 +4,7 @@ import store from '../store/store.js'
 export function getOwnedStocks() {
   axios({
     method: "GET", 
-    url: `${process.env.VUE_APP_API_URL}securities/get/${process.env.VUE_APP_TEST_USER}`
+    url: `${process.env.VUE_APP_API_URL}/securities/get/${process.env.VUE_APP_TEST_USER}`
   }).then(result => {
     store.dispatch('getOwnedStocks', result.data)
   }, error => {
@@ -15,7 +15,7 @@ export function getOwnedStocks() {
 export function getWatchlist() {
   axios({
     method: "GET", 
-    url: `${process.env.VUE_APP_API_URL}watchlist/get/${process.env.VUE_APP_TEST_USER}`
+    url: `${process.env.VUE_APP_API_URL}/watchlist/get/${process.env.VUE_APP_TEST_USER}`
   }).then(result => {
     store.dispatch('getWatchlist', result.data)
   }, error => {
@@ -26,7 +26,7 @@ export function getWatchlist() {
 export function searchForStock(searchQuery){
   axios({
     method: 'GET', 
-    url: `${process.env.VUE_APP_API_URL}securities/search`,
+    url: `${process.env.VUE_APP_API_URL}/securities/search`,
     params: {q: searchQuery}
     }).then(result => {
       store.dispatch('getSearchResults', result.data)
@@ -37,7 +37,7 @@ export function searchForStock(searchQuery){
 
 export function buySecurity(security, price, quantity, exchangeName){
   axios.post(
-    `${process.env.VUE_APP_API_URL}securities/buy/${process.env.VUE_APP_TEST_USER}`,
+    `${process.env.VUE_APP_API_URL}/securities/buy/${process.env.VUE_APP_TEST_USER}`,
     null,
     { 'params': {
         'symbol': security,
@@ -54,7 +54,7 @@ export function buySecurity(security, price, quantity, exchangeName){
 
 export function sellSecurity(security, price, sellQuantity, exchangeName){
   axios.post(
-    `${process.env.VUE_APP_API_URL}securities/sell/${process.env.VUE_APP_TEST_USER}`,
+    `${process.env.VUE_APP_API_URL}/securities/sell/${process.env.VUE_APP_TEST_USER}`,
     null,
     { 'params': {
         'symbol': security,
@@ -71,7 +71,7 @@ export function sellSecurity(security, price, sellQuantity, exchangeName){
 
 export function addToWatchlist(security, price, sellQuantity, exchangeName){
   axios.post(
-    `${process.env.VUE_APP_API_URL}securities/sell/${process.env.VUE_APP_TEST_USER}`,
+    `${process.env.VUE_APP_API_URL}/securities/sell/${process.env.VUE_APP_TEST_USER}`,
     null,
     { 'params': {
         'symbol': security,
