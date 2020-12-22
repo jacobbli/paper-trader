@@ -22,7 +22,6 @@ export default {
 
     actions: {
         setAccessToken(context, token) {
-            console.log(token)
             context.commit('SET_ACCESS_TOKEN', token)
         }
     }
