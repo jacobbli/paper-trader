@@ -43,6 +43,7 @@
 <script>
   import { buySecurity } from '../../api/SecuritiesApi.js'
   import { sellSecurity } from '../../api/SecuritiesApi.js'
+  import { mapGetters } from 'vuex'
 
   export default {
     name: 'QuantitySelector',
@@ -69,7 +70,8 @@
           return 'Choose the number of shares to sell'
         }
         return ''
-      } 
+      },
+      ...mapGetters(['accessToken'])
     },
 
     methods: {
@@ -91,7 +93,7 @@
 
       buyStock() {
         if(this.quantity > 0) {
-          buySecurity(this.stock, this.price, this.quantity, this.exchangeName)
+          buySecurity(this.accessToken, this.stock, this.price, this.quantity, this.exchangeName)
         }
         this.close()
       },
@@ -99,7 +101,7 @@
       sellStock() {
         if (this.quantity > 0) {
           if(this.quantity <= this.ownedQuantity) {
-            sellSecurity(this.stock, this.price, this.quantity, this.exchangeName)
+            sellSecurity(this.accessToken, this.stock, this.price, this.quantity, this.exchangeName)
           }
         }
         this.close()

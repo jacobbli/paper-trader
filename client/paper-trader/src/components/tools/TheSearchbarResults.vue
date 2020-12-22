@@ -78,9 +78,8 @@
     },
 
     computed: {
-      ...mapGetters({
-        allResults:'displayResults'
-      }),
+      ...mapGetters({allResults:'displayResults'}),
+      ...mapGetters(['accessToken']),
 
       dividedResults: function() {
         var array = []
@@ -128,7 +127,7 @@
       },
 
       addToWatchlist(security, price, exchangeName) {
-        addToWatchlist(security, price, exchangeName)
+        addToWatchlist(this.accessToken, security, price, exchangeName)
       },
 
       openQuantitySelector() {

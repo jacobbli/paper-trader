@@ -39,7 +39,8 @@
 <script>
   import { mapGetters } from 'vuex'
   import QuantitySelector from '../modal/QuantitySelector.vue'
-  import { getWatchlist, removeSecurity } from '../../api/WatchlistApi.js'
+  import { removeSecurity } from '../../api/WatchlistApi.js'
+  import { getWatchlist } from '../../api/UsersApi.js'
 
   export default {
     name: 'StockWatchlist',
@@ -54,16 +55,17 @@
         priceToPass: Number,
         exchangeNameToPass: String,
         ownedQuantity: 0,
-        action: String
+        action: String,
       }
     },
 
     mounted() {
-        getWatchlist()
+      getWatchlist(this.accessToken)
     },
 
     computed: {
-        ...mapGetters({watchlist:'displayWatchlist'})
+        ...mapGetters({watchlist:'displayWatchlist'}),
+        ...mapGetters(['accessToken'])
     },
 
     methods: {
@@ -76,7 +78,7 @@
       },
 
       removeFromWatchlist(stock, exchangeName) {
-        removeSecurity(stock, exchangeName)
+        removeSecurity(this.accessToken, stock, exchangeName)
       },
       
       openQuantitySelector(){
