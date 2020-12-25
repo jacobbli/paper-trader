@@ -1,33 +1,22 @@
 <template>
-  <a-form :model="login_form">
-    <a-row>
-      <a-form-item>
-        <a-col :span="3">
-          <label for="username" required>Username:</label>
-        </a-col>
-        <a-col :span="6">
-          <a-input v-model="login_form.username" name="username" required/>
-        </a-col>
-      </a-form-item>
-    </a-row>
-    <a-row>
-      <a-form-item>
-        <a-col :span="3">
-          <label for="password">Password:</label>
-        </a-col>
-        <a-col :span="6">
-          <a-input v-model="login_form.password" name="password" type="password" required/>
-        </a-col>
-      </a-form-item>
-    </a-row>
-    <a-row>
-      <a-form-item>
-        <a-col>
-          <a-button @click="onSubmit" type="primary">Login</a-button>
-        </a-col>
-      </a-form-item>
-    </a-row>
-  </a-form>
+  <a-row>
+    <a-col>
+      <a-form
+        :model="loginForm"
+        :label-col="{span: 5}"
+        :wrapper-col="{span: 14}">
+          <a-form-item label="Username" class="login-form-row" required has-feedback>
+              <a-input v-model="loginForm.username" name="username"/>
+          </a-form-item>
+          <a-form-item label="Password" class="login-form-row" required has-feedback>
+              <a-input v-model="loginForm.password" name="password" type="password"/>
+          </a-form-item>
+          <a-form-item :wrapper-col="{ span: 14, offset: 5 }">
+              <a-button @click="onSubmit" type="primary" htmlType="submit" :disabled='isDisabled'>Login</a-button>
+          </a-form-item>
+      </a-form>
+    </a-col>
+  </a-row>
 </template>
 
 <script>
@@ -37,21 +26,29 @@ export default {
   name: 'Login',
   data() {
     return{
-      login_form: {
+      loginForm: {
         username: '',
         password: ''
-      }
+      },
+      disableSubmit: false
     }
   },
   methods: {
     onSubmit() {
-      var form = new FormData();
-      form.append('username', this.login_form.username);
-      form.append('password', this.login_form.password)
-      login(form)
+        var form = new FormData();
+        form.append('username', this.loginForm.username);
+        form.append('password', this.loginForm.password)
+        login(form)
+    },
+  },
+  computed: {
+    isDisabled() {
+      if (this.loginForm.username.length == 0 || this.loginForm.password.length == 0) {
+        return true
+      }
+      return false
     }
   }
-  // TODO: Add form validation
 }
 </script>
 
