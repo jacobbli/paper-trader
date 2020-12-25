@@ -1,10 +1,20 @@
-import re
-
-from fastapi.responses import JSONResponse
-
 from paper_trader.models import DocumentModel, SearchModel, UpdateModel, InsertModel
 from paper_trader.db.database import get_cursor, commit_to_database
 from . import utils
+
+
+def get_owned_securities(username: str, table_name: str = 'owned_securities', order_by: str = 'security_symbol', order: str = 'ASC' ):
+    db, db_cursor = get_cursor()
+    query = f"""
+        SELECT AVG(price), SUM(quantity), security_symbol, exchange_name
+        FROM {table_name}
+        WHERE {table_name}.username = '{username}'
+        GROUP BY security_symbol, exchange_name
+        ORDER BY {order_by} {order}
+        """
+    db_cursor.execute(query)
+    results = db_cursor.fetchall()
+    return results
 
 
 def get_purchase_value(symbol, exchange):
@@ -40,8 +50,8 @@ def search(search_term):
 def insert_transaction(params):
     db, db_cursor = get_cursor()
     query = f"""
-        INSERT INTO transactions (user_name, security_symbol, exchange_name, price, quantity)
-        VALUES ('{params['user_name']}', '{params['security_symbol']}', '{params['exchange_name']}', {params['price']}, {params['quantity']})
+        INSERT INTO transactions (username, security_symbol, exchange_name, price, quantity)
+        VALUES ('{params['username']}', '{params['security_symbol']}', '{params['exchange_name']}', {params['price']}, {params['quantity']})
         """
     db_cursor.execute(query)
     commit_to_database(db, db_cursor)

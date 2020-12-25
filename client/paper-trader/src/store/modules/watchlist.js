@@ -26,7 +26,7 @@ export default {
   },
   
   actions: {
-    getWatchlist(context, watchList){
+    getWatchlist(context, watchList) {
       context.commit('getWatchlist', watchList)
     },
 

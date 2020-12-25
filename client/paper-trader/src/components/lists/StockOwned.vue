@@ -31,7 +31,7 @@
 <script>
   import { mapGetters } from 'vuex'
   import QuantitySelector from '../modal/QuantitySelector.vue'
-  import {getOwnedStocks} from '../../api/SecuritiesApi.js'
+  import { getOwnedStocks } from '../../api/UsersApi.js'
 
   export default {
     name: 'StockOwned',
@@ -51,11 +51,12 @@
     },
 
     mounted() {
-      getOwnedStocks()
+      getOwnedStocks(this.accessToken)
     },
 
     computed: {
-        ...mapGetters({stocksOwned:'displayOwnedStocks'})
+        ...mapGetters({stocksOwned:'displayOwnedStocks'}),
+        ...mapGetters(['accessToken'])
     },
     
     methods: {
