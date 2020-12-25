@@ -1,7 +1,7 @@
 <template>
   <div id="app" class='main grid-container'>
     <a-layout>
-      <div class='header'>
+      <div class='header' v-if="isLoggedIn">
         <a-layout-header>
           <div class="logo" >
           </div>
@@ -14,7 +14,7 @@
               <router-link to="/">Home</router-link>
             </a-menu-item>
             <a-menu-item key="2">
-              <router-link to="/Login">Login</router-link>
+              <a @click='logout()'>Logout</a>
             </a-menu-item>
           </a-menu>
         </a-layout-header>
@@ -32,6 +32,25 @@
     </a-layout>
   </div>
 </template>
+
+<script>
+  import { mapGetters } from 'vuex'
+  import { logout } from './api/AuthenticationApi.js'
+
+  export default {
+    name: 'App',
+
+    computed: {
+      ...mapGetters(['isLoggedIn'])
+    },
+
+    methods: {
+      logout() {
+        logout()
+      }
+    }
+  }
+</script>
 
 <style>
 #app {
