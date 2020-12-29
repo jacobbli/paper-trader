@@ -71,7 +71,7 @@
         }
         return ''
       },
-      ...mapGetters(['accessToken'])
+      ...mapGetters(['getAccessToken'])
     },
 
     methods: {
@@ -93,7 +93,7 @@
 
       buyStock() {
         if(this.quantity > 0) {
-          buySecurity(this.accessToken, this.stock, this.price, this.quantity, this.exchangeName)
+          buySecurity(this.getAccessToken, this.stock, this.price, this.quantity, this.exchangeName)
         }
         this.close()
       },
@@ -101,7 +101,7 @@
       sellStock() {
         if (this.quantity > 0) {
           if(this.quantity <= this.ownedQuantity) {
-            sellSecurity(this.accessToken, this.stock, this.price, this.quantity, this.exchangeName)
+            sellSecurity(this.getAccessToken, this.stock, this.price, this.quantity, this.exchangeName)
           }
         }
         this.close()
