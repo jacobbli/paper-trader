@@ -1,6 +1,5 @@
 <template>
-  <div class='search-tool'>
-    <div class='searchbar'>
+    <div class='search'>
       <a-input-search
         placeholder="Enter a ticker symbol"
         enter-button="Search"
@@ -8,13 +7,10 @@
         style="width: 500px;"
         @search="searchForStock"
       />
+    <a-modal :visible="resultsVisible" title="Search Results" @ok='closeSearchResults' @cancel='closeSearchResults' width='1000px'>
+      <the-searchbar-results></the-searchbar-results>
+    </a-modal>
     </div>
-    <div 
-      class='search-results'
-    >
-      <the-searchbar-results :firstPage="0"></the-searchbar-results>
-    </div>
-  </div>
 </template>
 
 <script>
@@ -26,9 +22,20 @@
         TheSearchbarResults
     },
 
+    data() {
+      return {
+        resultsVisible: false
+      }
+    },
+
     methods: {
       searchForStock(value) {
-        searchForStock(value)
+        searchForStock(value).then(() => {
+          this.resultsVisible = true
+        })
+      },
+      closeSearchResults() {
+        this.resultsVisible = false;
       }
     },
   }
@@ -36,5 +43,4 @@
 
 <!-- Add 'scoped' attribute to limit CSS to this component only -->
 <style scoped>
-
 </style>
