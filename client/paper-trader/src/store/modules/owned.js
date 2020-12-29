@@ -2,77 +2,95 @@ import Vue from 'vue'
 
 export default {
   state: {
-    owned: {},
+    owned: [],
   },
   
   getters: {
-      displayOwnedStocks(state) {
+      getOwnedSecurities(state) {
           return state.owned
       }
   },
   
   mutations: {
-    getOwnedStocks(state, stockList){
+    SET_OWNED_SECURITIES(state, stockList){
       state.owned = stockList
     },
 
-    addStock(state, payload) {
-      Vue.set(state.owned, payload.symbol, [payload.price, parseInt(payload.quantity), payload.exchange_name])
+    ADD_OWNED_SECURITY(state, payload) {
+      state.owned.push({
+        'symbol': payload.symbol,
+        'avg_price': payload.price,
+        'quantity': parseInt(payload.quantity),
+        'exchange': payload.exchange
+      })
     },
 
-    removeStock(state, payload) {
-      Vue.delete(state.owned, payload.symbol)
+    REMOVE_OWNED_SECURITY(state, payload) {
+      Vue.delete(state.owned, payload)
     },
 
-    incrementQuantity(state, payload) {
-      var newQuantity = state.owned[payload.symbol][1] + parseInt(payload.quantity)
-      var totalValue = state.owned[payload.symbol][0]*state.owned[payload.symbol][1] + payload.price*parseInt(payload.quantity)
-      var unitValue = totalValue / newQuantity
-      Vue.set(state.owned, payload.symbol, [unitValue, newQuantity, payload.exchange_name])
+    INCREMENT_QUANTITY(state, payload) {
+      Vue.set(state.owned[payload.index], 'quantity', payload.quantity)
     },
 
-    decrementQuantity(state, payload) {
-      Vue.set(state.owned, payload.symbol, [payload.price, payload.new_quantity, payload.exchange_name])
+    UPDATE_PRICE(state, payload) {
+      Vue.set(state.owned[payload.index], 'avg_price', payload.price)
+    },
+
+    DECREMENT_QUANTITY(state, payload) {
+      Vue.set(state.owned[payload.index], 'quantity', payload.quantity)
     }
   },
   
   actions: {
     getOwnedStocks(context, stockList){
-      context.commit('getOwnedStocks', stockList)
+      context.commit('SET_OWNED_SECURITIES', stockList)
     },
 
-    buy(context, payload) {
-      context.dispatch('stockAlreadyOwned', payload.symbol).then( result => {
-        if(result===false) {
-          context.commit('addStock', payload)
+    buySecurity(context, payload) {
+      context.dispatch('getOwnedSecurityIndex', payload.symbol).then( securityIndex => {
+        if(securityIndex===null) {
+          context.commit('ADD_OWNED_SECURITY', payload)
         } else {
-          context.commit('incrementQuantity', payload)
+          const newQuantity = context.state.owned[securityIndex]['quantity'] + parseInt(payload.quantity)
+          const totalValue = context.state.owned[securityIndex]['avg_price']*context.state.owned[securityIndex]['quantity'] + payload.price*parseInt(payload.quantity)
+          const avgPrice = totalValue / newQuantity
+
+          payload = {
+            'index': securityIndex,
+            'quantity': newQuantity,
+            'price': avgPrice
+          }
+          context.commit('INCREMENT_QUANTITY', payload)
+          context.commit('UPDATE_PRICE', payload)
         }
       })
     },
 
-    sell(context, payload) {
-      var originalQuantity = context.state.owned[payload.symbol][1]
-      var newQuantity = originalQuantity - payload.sell_quantity
-      if(newQuantity == 0) {
-        context.commit('removeStock', payload)
-      } else {
-        payload = {
-          'symbol': payload.symbol,
-          'new_quantity': newQuantity,
-          'price': payload.price,
-          'exchange_name': payload.exchange_name
+    sellSecurity(context, payload) {
+      context.dispatch('getOwnedSecurityIndex', payload.symbol).then( securityIndex => {
+        var originalQuantity = context.state.owned[securityIndex]['quantity']
+        var newQuantity = originalQuantity - payload.sellQuantity
+        if(newQuantity == 0) {
+          context.commit('REMOVE_OWNED_SECURITY', securityIndex)
+        } else {
+          payload = {
+            'index': securityIndex,
+            'quantity': newQuantity,
+          }
+          context.commit('DECREMENT_QUANTITY', payload)
         }
-        context.commit('decrementQuantity', payload)
-      }
+      })
     },
 
-    stockAlreadyOwned(context, symbol) {
-      var security_exists = false
-      if(Object.keys(context.state.owned).includes(symbol)) {
-        security_exists = true
-      }
-      return security_exists
+    getOwnedSecurityIndex(context, symbol) {
+      var securityIndex = null
+      context.state.owned.forEach( (item, index) => {
+        if(Object.values(item).includes(symbol)) {
+          securityIndex = index
+        }
+      })
+      return securityIndex
     }
   }
 };

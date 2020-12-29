@@ -8,7 +8,10 @@ export default {
     },
 
     getters: {
-        accessToken: state => state.accessToken,
+        getFunds: state => state.funds,
+        getFirstName: state => state.firstName,
+        getLastName: state => state.lastName,
+        getAccessToken: state => { return (state.accessToken == 'null'? null : state.accessToken) },
         isLoggedIn : state => !!state.accessToken
     },
 

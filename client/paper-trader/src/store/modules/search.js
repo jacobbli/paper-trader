@@ -4,7 +4,7 @@ export default {
   },
   
   getters: {
-    displayResults(state) {
+    getSearchResults(state) {
       return state.searchResults
     }
   },
