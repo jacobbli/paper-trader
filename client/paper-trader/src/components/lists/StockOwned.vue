@@ -1,20 +1,13 @@
 <template>
-  <div id="owned-stocks-table">
-    <h2>Owned Stocks</h2>
-    <table>
-      <tr>
-        <th>Stock Symbol</th>
-        <th>Purchase Price</th>
-        <th>Quantity</th>
-      </tr>
-      <tr v-for="(data, name) in stocksOwned" :key='name'>
-        <td>{{name}}</td>
-        <td>${{data[0].toFixed(2)}}</td>
-        <td>{{data[1]}}</td>
-        <td><a-button type="primary" @click='buyStock(name, data[0], data[2])'>Buy</a-button></td>
-        <td><a-button @click='sellStock(name, data[1], data[0], data[2])'>Sell</a-button></td>
-      </tr>
-    </table>
+  <div id="owned-stocks-table" >
+    <a-table :columns='columns' :data-source='getOwnedSecurities' rowKey='symbol'>
+      <span slot="avg-price" slot-scope="price">{{ price.toFixed(2)}} </span>
+      <span slot="actions" slot-scope="stockInfo">
+        <a-button type="primary" @click="buyStock(stockInfo)">Buy</a-button>
+        <a-divider type="vertical" />
+        <a-button @click='sellStock(stockInfo)'>Sell</a-button>
+      </span>
+    </a-table>
     <quantity-selector 
       style="z-index: 100"
       v-if=showQuantitySelector
@@ -33,6 +26,34 @@
   import QuantitySelector from '../modal/QuantitySelector.vue'
   import { getOwnedStocks } from '../../api/UsersApi.js'
 
+  const columns = [
+    {
+      title: 'Symbol',
+      dataIndex: 'symbol',
+      key: 'symbol',
+    },
+    {
+      title: 'Average Price',
+      dataIndex: 'avg_price',
+      key: 'averagePrice',
+      scopedSlots: { customRender: 'avg-price' }
+    },
+    {
+      title: 'Quantity',
+      dataIndex: 'quantity',
+      key: 'quantity'
+    },
+    {
+      title: 'Exchange',
+      dataIndex: 'exchange',
+      key: 'exchange'
+    },
+    {
+      title: 'Actions',
+      key: 'actions',
+      scopedSlots: { customRender: 'actions' }
+    }
+  ]
   export default {
     name: 'StockOwned',
     components: {
@@ -46,33 +67,33 @@
         priceToPass: Number,
         exchangeNameToPass: String,
         ownedQuantity: 0,
-        action: String
+        action: String,
+        columns
       }
     },
 
     mounted() {
-      getOwnedStocks(this.accessToken)
+      getOwnedStocks(this.getAccessToken)
     },
 
     computed: {
-        ...mapGetters({stocksOwned:'displayOwnedStocks'}),
-        ...mapGetters(['accessToken'])
+        ...mapGetters(['getOwnedSecurities', 'getAccessToken', 'isLoggedIn']),
     },
     
     methods: {
-      buyStock(stock, price, exchangeName) {
-        this.stockToPass = stock
-        this.priceToPass = price
-        this.exchangeNameToPass = exchangeName
+      buyStock(stockInfo) {
+        this.stockToPass = stockInfo['symbol']
+        this.priceToPass = stockInfo['avg_price']
+        this.exchangeNameToPass = stockInfo['exchange']
         this.action = 'buy'
         this.openQuantitySelector()
       },
 
-      sellStock(stock, ownedQuantity, price, exchangeName) {
-        this.stockToPass = stock
-        this.priceToPass = price
-        this.ownedQuantity = ownedQuantity
-        this.exchangeNameToPass = exchangeName
+      sellStock(stockInfo) {
+        this.stockToPass = stockInfo['symbol']
+        this.priceToPass = stockInfo['avg_price']
+        this.ownedQuantity = stockInfo['quantity']
+        this.exchangeNameToPass = stockInfo['exchange']
         this.action = 'sell'
         this.openQuantitySelector()
       },

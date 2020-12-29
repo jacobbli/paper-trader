@@ -1,41 +1,12 @@
 <template>
-  <div id="search-results" v-if='showResults'>
-    <h2>Search Results</h2>
-      <table>
-        <tr>
-          <th>Stock Symbol</th>
-          <th>Company Name</th>
-          <th>Exchange</th>
-          <th>Price</th>
-        </tr>
-        <tr v-for="stock in resultsToDisplay" :key="stock[0]">
-          <td>{{stock[0]}}</td>
-          <td>{{stock[1]}}</td>
-          <td>{{stock[3]}}</td>
-          <td>${{stock[2]}}</td>
-          <td><a-button type="primary" @click='buyStock(stock[0], stock[2], stock[3])'>Buy</a-button></td>
-          <td><a-button @click='addToWatchlist(stock[0], stock[2], stock[3] )'>Add to watchlist</a-button></td>
-      </tr>
-    </table>
-    <footer class='page-number'>
-      <button 
-        class='prev-page'
-        v-if='showPreviousPageButton'
-        @click='currentPage--'
-      >
-      &lt;
-      </button>
-      {{currentPage + 1}} of {{totalPages}}
-      <button 
-        class='next-page'
-        v-if='showNextPageButton'
-        :ownedQuantity="ownedQuantity"
-        :action="action"      
-        @click='currentPage++'
-      >
-      &gt;
-      </button>
-    </footer>
+  <div id="search-results">
+    <a-table :columns='columns' :data-source="getSearchResults" rowKey='symbol'>
+      <span slot="actions" slot-scope="securityInfo">
+        <a-button type="primary" @click="buyStock(securityInfo)">Buy</a-button>
+        <a-divider type="vertical" />
+        <a-button @click='addToWatchlist(securityInfo)'>Add to watchlist</a-button>
+      </span>
+    </a-table>
     <quantity-selector 
       style="z-index: 100"
       v-if=showQuantitySelector
@@ -53,6 +24,34 @@
   import { mapGetters } from 'vuex'
   import { addToWatchlist } from '../../api/WatchlistApi.js'
 
+  const columns = [
+    {
+      title: 'Symbol',
+      dataIndex: 'symbol',
+      key: 'symbol',
+    },
+    {
+      title: 'Company Name',
+      dataIndex: 'company',
+      key: 'company',
+    },
+    {
+      title: 'Exchange',
+      dataIndex: 'exchange',
+      key: 'exchange'
+    },
+    {
+      title: 'Price',
+      key: 'price',
+      dataIndex: 'price',
+    },
+    {
+      title: 'Actions',
+      key: 'actions',
+      width: 250,
+      scopedSlots: { customRender: 'actions' }
+    }
+  ]
   export default {
     
     name: 'TheSearchbarResults',
@@ -70,64 +69,27 @@
         stockToPass: String,
         priceToPass: Number,
         exchangeNameToPass: String,
-        resultsPerPage: 5,
-        currentPage: this.firstPage,
         ownedQuantity: 0,
-        action: String
+        action: String,
+        columns
       }
     },
 
     computed: {
-      ...mapGetters({allResults:'displayResults'}),
-      ...mapGetters(['accessToken']),
-
-      dividedResults: function() {
-        var array = []
-        for (var i = 0; i < this.allResults.length; i+=5) {
-          array.push(this.allResults.slice(i,i+5))
-        }
-        return array
-      },
-
-      totalPages: function() {
-        return this.dividedResults.length
-      },
-
-      resultsToDisplay: function() {
-        return (this.dividedResults)[this.currentPage]
-      },
-
-      showPreviousPageButton: function() {
-        if (this.currentPage === 0){
-          return false;
-        } else {
-          return true;
-        }
-      },
-      showNextPageButton: function() {
-        if (this.currentPage === this.totalPages-1){
-          return false;
-        } else {
-          return true;
-        }
-      },
-
-      showResults: function() {
-        return this.allResults.length > 0
-      }
+      ...mapGetters(['getSearchResults', 'getAccessToken'])
     },
 
     methods: {
-      buyStock(stock, price, exchangeName) {
-        this.stockToPass = stock
-        this.priceToPass = price
-        this.exchangeNameToPass = exchangeName
+      buyStock(securityInfo) {
+        this.stockToPass = securityInfo['symbol']
+        this.priceToPass = securityInfo['price']
+        this.exchangeNameToPass = securityInfo['exchange']
         this.action = 'buy'
         this.openQuantitySelector()
       },
 
-      addToWatchlist(security, price, exchangeName) {
-        addToWatchlist(this.accessToken, security, price, exchangeName)
+      addToWatchlist(securityInfo) {
+        addToWatchlist(this.getAccessToken, securityInfo['symbol'], securityInfo['price'], securityInfo['exchange'])
       },
 
       openQuantitySelector() {
@@ -138,19 +100,5 @@
         this.showQuantitySelector = false
       },
     },
-
-    watch: {
-      allResults: function () {
-        this.currentPage = 0;
-      }
-    }
   }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-.page-number {
-  text-align: center;
-  padding-top: 1em;
-}
-</style>
