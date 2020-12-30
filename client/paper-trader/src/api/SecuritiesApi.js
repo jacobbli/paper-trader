@@ -17,37 +17,37 @@ export function searchForStock(searchQuery){
   })
 }
 
-export function buySecurity(token, security, price, quantity, exchangeName){
+export function buySecurity(orderForm){
   axios({
     method: 'POST',
     url: `${process.env.VUE_APP_API_URL}/securities/buy`,
     data: {
-        'token': token,
-        'symbol': security,
-        'exchange': exchangeName,
-        'quantity': quantity,
-        'price': price
+        'token': store.getters.getAccessToken,
+        'symbol': orderForm.get('symbol'),
+        'exchange': orderForm.get('exchange'),
+        'quantity': orderForm.get('quantity'),
+        'price': orderForm.get('price')
       }
     }).then(() => {
-    store.dispatch('buySecurity', {symbol: security, price: price, quantity: quantity, exchange: exchangeName}) }, error => {
+    store.dispatch('buySecurity', {symbol: orderForm.get('symbol'), price: orderForm.get('price'), quantity: orderForm.get('quantity'), exchange: orderForm.get('exchange')}) }, error => {
     console.error(error);
   })
 }
 
-export function sellSecurity(token, security, price, sellQuantity, exchangeName){
+export function sellSecurity(orderForm){
   axios({
     method: 'POST',
     url: `${process.env.VUE_APP_API_URL}/securities/sell`,
     data: {
-        'token': token,
-        'symbol': security,
-        'quantity': sellQuantity,
-        'price': price,
-        'exchange': exchangeName
+        'token': store.getters.getAccessToken,
+        'symbol': orderForm.get('symbol'),
+        'exchange': orderForm.get('exchange'),
+        'quantity': orderForm.get('quantity'),
+        'price': orderForm.get('price')
       }
     }
   ).then(() => {
-    store.dispatch('sellSecurity', {symbol: security, price: price, sellQuantity: sellQuantity, exchange: exchangeName})  }, error => {
+    store.dispatch('sellSecurity', {symbol: orderForm.get('symbol'), price: orderForm.get('price'), sellQuantity: orderForm.get('quantity'), exchange: orderForm.get('exchange')})  }, error => {
     console.error(error);
   })
 }
