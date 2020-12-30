@@ -3,21 +3,20 @@
     <a-table :columns='columns' :data-source='getOwnedSecurities' rowKey='symbol'>
       <span slot="avg-price" slot-scope="price">{{ price.toFixed(2)}} </span>
       <span slot="actions" slot-scope="stockInfo">
-        <a-button type="primary" @click="buyStock(stockInfo)">Buy</a-button>
+        <a-button type="primary" @click="placeBuyOrder(stockInfo)">Buy</a-button>
         <a-divider type="vertical" />
-        <a-button @click='sellStock(stockInfo)'>Sell</a-button>
+        <a-button @click='placeSellOrder(stockInfo)'>Sell</a-button>
       </span>
     </a-table>
+    <a-modal
+      :visible='modalVisible'
+      @ok='confirmOrder()'
+      @cancel='closeQuantitySelector()'
+    >
     <quantity-selector 
-      style="z-index: 100"
-      v-if=showQuantitySelector
-      :stock="stockToPass"
-      :price="priceToPass"
-      :exchangeName=exchangeNameToPass
-      :ownedQuantity="ownedQuantity"
-      :action="action"
-      @close=closeQuantitySelector
-    ></quantity-selector>
+      :ownedQuantity='ownedQuantity'
+      @changeOrderQuantity='orderQuantity = $event'></quantity-selector>
+    </a-modal>
   </div>
 </template>
 
@@ -25,8 +24,9 @@
   import { mapGetters } from 'vuex'
   import QuantitySelector from '../modal/QuantitySelector.vue'
   import { getOwnedStocks } from '../../api/UsersApi.js'
+  import { buySecurity, sellSecurity } from '../../api/SecuritiesApi.js'
 
-  const columns = [
+const columns = [
     {
       title: 'Symbol',
       dataIndex: 'symbol',
@@ -62,13 +62,13 @@
 
     data() {
       return{
-        showQuantitySelector: false,
-        stockToPass: {},
-        priceToPass: Number,
-        exchangeNameToPass: String,
+        modalVisible: false,
+        modalTitle: '',
         ownedQuantity: 0,
-        action: String,
-        columns
+        orderQuantity: 1,
+        orderType: '',
+        columns,
+        orderForm: new FormData()
       }
     },
 
@@ -81,35 +81,41 @@
     },
     
     methods: {
-      buyStock(stockInfo) {
-        this.stockToPass = stockInfo['symbol']
-        this.priceToPass = stockInfo['avg_price']
-        this.exchangeNameToPass = stockInfo['exchange']
-        this.action = 'buy'
+      placeBuyOrder(stockInfo) {
+        this.orderForm.append('symbol', stockInfo['symbol'])
+        this.orderForm.append('price', stockInfo['avg_price'])
+        this.orderForm.append('exchange', stockInfo['exchange'])
+        this.ownedQuantity = stockInfo['quantity']
+        this.orderType = 'buy'
         this.openQuantitySelector()
       },
 
-      sellStock(stockInfo) {
-        this.stockToPass = stockInfo['symbol']
-        this.priceToPass = stockInfo['avg_price']
+      placeSellOrder(stockInfo) {
+        this.orderForm.append('symbol', stockInfo['symbol'])
+        this.orderForm.append('price', stockInfo['avg_price'])
+        this.orderForm.append('exchange', stockInfo['exchange'])
         this.ownedQuantity = stockInfo['quantity']
-        this.exchangeNameToPass = stockInfo['exchange']
-        this.action = 'sell'
+        this.orderType = 'sell'
         this.openQuantitySelector()
+      },
+
+      confirmOrder() {
+        this.orderForm.append('quantity', this.orderQuantity)
+        if (this.orderType == 'buy') {
+          buySecurity(this.orderForm)
+        } else if (this.orderType == 'sell') {
+          sellSecurity(this.orderForm)
+        }
+        this.closeQuantitySelector()
       },
 
       openQuantitySelector(){
-        this.showQuantitySelector = true
+        this.modalVisible = true
       },
 
       closeQuantitySelector(){
-        this.showQuantitySelector = false
-      },
+        this.modalVisible = false
+      }
     }
   }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-
-</style>

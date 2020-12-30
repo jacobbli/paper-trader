@@ -13,7 +13,7 @@
             </a-col>
             <a-col :span="8" :offset='3'>
               <div class="searchbar">
-                <the-searchbar></the-searchbar>
+                <search-bar></search-bar>
               </div>
             </a-col>
             <a-col :span="2" :offset='7'>
@@ -53,12 +53,12 @@
 <script>
   import { mapGetters } from 'vuex'
   import { logout } from '../api/AuthenticationApi.js'
-  import TheSearchbar from '../components/tools/TheSearchbar.vue'
+  import SearchBar from '../components/tools/SearchBar.vue'
 
   export default {
     name: 'Home',
     components: {
-      TheSearchbar
+      SearchBar
     },
 
     computed: {
