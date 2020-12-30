@@ -18,20 +18,32 @@ export function login(login_form) {
   }
 
 export function isAuthenticated() {
-  axios({
-    method: 'POST',
-    url:`${process.env.VUE_APP_API_URL}/users/authenticated`,
-    data: {
-      'access_token': store.getters.accessToken,
-      'token_type': 'bearer'
+  return new Promise( (resolve, reject) => {
+    if (store.getters.getAccessToken !== null) {
+      axios({
+        method: 'POST',
+        url:`${process.env.VUE_APP_API_URL}/users/authenticated`,
+        data: {
+          'access_token': store.getters.getAccessToken,
+          'token_type': 'bearer'
+        }
+      }).then(result => {
+        store.dispatch('setCurrentUser', result.data);
+        resolve();
+      },
+      () => {
+        store.dispatch('logout');
+        reject();
+      })
+    } else {
+      store.dispatch('logout');
+      reject();
     }
-  }).then(result => {
-    return result
   })
 }
 
 export function logout() {
   store.dispatch('logout').then(() =>
-    router.push('/')
+    router.push('/login')
   )
 }

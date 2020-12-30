@@ -8,7 +8,10 @@ export default {
     },
 
     getters: {
-        accessToken: state => state.accessToken,
+        getFunds: state => state.funds,
+        getFirstName: state => state.firstName,
+        getLastName: state => state.lastName,
+        getAccessToken: state => { return (state.accessToken == 'null'? null : state.accessToken) },
         isLoggedIn : state => !!state.accessToken
     },
 
@@ -46,6 +49,10 @@ export default {
         },
         setFunds(context, funds) {
             context.commit('SET_FUNDS', funds)
+        },
+        updateFunds(context, difference) {
+            const newFunds = context.state.funds - difference
+            context.commit('SET_FUNDS', newFunds)
         },
         setCurrentUser(context, payload) {
             context.dispatch('setAccessToken', payload['access_token']);

@@ -1,30 +1,22 @@
 <template>
-  <div id="owned-stocks-table">
-    <h2>Owned Stocks</h2>
-    <table>
-      <tr>
-        <th>Stock Symbol</th>
-        <th>Purchase Price</th>
-        <th>Quantity</th>
-      </tr>
-      <tr v-for="(data, name) in stocksOwned" :key='name'>
-        <td>{{name}}</td>
-        <td>${{data[0].toFixed(2)}}</td>
-        <td>{{data[1]}}</td>
-        <td><a-button type="primary" @click='buyStock(name, data[0], data[2])'>Buy</a-button></td>
-        <td><a-button @click='sellStock(name, data[1], data[0], data[2])'>Sell</a-button></td>
-      </tr>
-    </table>
+  <div id="owned-stocks-table" >
+    <a-table :columns='columns' :data-source='getOwnedSecurities' rowKey='symbol'>
+      <span slot="avg-price" slot-scope="price">{{ price.toFixed(2)}} </span>
+      <span slot="actions" slot-scope="stockInfo">
+        <a-button type="primary" @click="placeBuyOrder(stockInfo)">Buy</a-button>
+        <a-divider type="vertical" />
+        <a-button @click='placeSellOrder(stockInfo)'>Sell</a-button>
+      </span>
+    </a-table>
+    <a-modal
+      :visible='modalVisible'
+      @ok='confirmOrder()'
+      @cancel='closeQuantitySelector()'
+    >
     <quantity-selector 
-      style="z-index: 100"
-      v-if=showQuantitySelector
-      :stock="stockToPass"
-      :price="priceToPass"
-      :exchangeName=exchangeNameToPass
-      :ownedQuantity="ownedQuantity"
-      :action="action"
-      @close=closeQuantitySelector
-    ></quantity-selector>
+      :ownedQuantity='ownedQuantity'
+      @changeOrderQuantity='orderQuantity = $event'></quantity-selector>
+    </a-modal>
   </div>
 </template>
 
@@ -32,7 +24,36 @@
   import { mapGetters } from 'vuex'
   import QuantitySelector from '../modal/QuantitySelector.vue'
   import { getOwnedStocks } from '../../api/UsersApi.js'
+  import { buySecurity, sellSecurity } from '../../api/SecuritiesApi.js'
 
+const columns = [
+    {
+      title: 'Symbol',
+      dataIndex: 'symbol',
+      key: 'symbol',
+    },
+    {
+      title: 'Average Price',
+      dataIndex: 'avg_price',
+      key: 'averagePrice',
+      scopedSlots: { customRender: 'avg-price' }
+    },
+    {
+      title: 'Quantity',
+      dataIndex: 'quantity',
+      key: 'quantity'
+    },
+    {
+      title: 'Exchange',
+      dataIndex: 'exchange',
+      key: 'exchange'
+    },
+    {
+      title: 'Actions',
+      key: 'actions',
+      scopedSlots: { customRender: 'actions' }
+    }
+  ]
   export default {
     name: 'StockOwned',
     components: {
@@ -41,54 +62,60 @@
 
     data() {
       return{
-        showQuantitySelector: false,
-        stockToPass: {},
-        priceToPass: Number,
-        exchangeNameToPass: String,
+        modalVisible: false,
+        modalTitle: '',
         ownedQuantity: 0,
-        action: String
+        orderQuantity: 1,
+        orderType: '',
+        columns,
+        orderForm: new FormData()
       }
     },
 
     mounted() {
-      getOwnedStocks(this.accessToken)
+      getOwnedStocks(this.getAccessToken)
     },
 
     computed: {
-        ...mapGetters({stocksOwned:'displayOwnedStocks'}),
-        ...mapGetters(['accessToken'])
+        ...mapGetters(['getOwnedSecurities', 'getAccessToken', 'isLoggedIn']),
     },
     
     methods: {
-      buyStock(stock, price, exchangeName) {
-        this.stockToPass = stock
-        this.priceToPass = price
-        this.exchangeNameToPass = exchangeName
-        this.action = 'buy'
+      placeBuyOrder(stockInfo) {
+        this.orderForm.append('symbol', stockInfo['symbol'])
+        this.orderForm.append('price', stockInfo['avg_price'])
+        this.orderForm.append('exchange', stockInfo['exchange'])
+        this.ownedQuantity = stockInfo['quantity']
+        this.orderType = 'buy'
         this.openQuantitySelector()
       },
 
-      sellStock(stock, ownedQuantity, price, exchangeName) {
-        this.stockToPass = stock
-        this.priceToPass = price
-        this.ownedQuantity = ownedQuantity
-        this.exchangeNameToPass = exchangeName
-        this.action = 'sell'
+      placeSellOrder(stockInfo) {
+        this.orderForm.append('symbol', stockInfo['symbol'])
+        this.orderForm.append('price', stockInfo['avg_price'])
+        this.orderForm.append('exchange', stockInfo['exchange'])
+        this.ownedQuantity = stockInfo['quantity']
+        this.orderType = 'sell'
         this.openQuantitySelector()
+      },
+
+      confirmOrder() {
+        this.orderForm.append('quantity', this.orderQuantity)
+        if (this.orderType == 'buy') {
+          buySecurity(this.orderForm)
+        } else if (this.orderType == 'sell') {
+          sellSecurity(this.orderForm)
+        }
+        this.closeQuantitySelector()
       },
 
       openQuantitySelector(){
-        this.showQuantitySelector = true
+        this.modalVisible = true
       },
 
       closeQuantitySelector(){
-        this.showQuantitySelector = false
-      },
+        this.modalVisible = false
+      }
     }
   }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-
-</style>

@@ -1,9 +1,9 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import BaseDashboard from '../components/pages/BaseDashboard.vue'
-import Login from '../components/pages/Login.vue'
-import store from '../store/store.js'
+import Dashboard from '../views/Dashboard.vue'
+import Login from '../views/Login.vue'
 import Home from '../views/Home.vue'
+import { isAuthenticated } from '../api/AuthenticationApi.js'
 
 Vue.use(VueRouter)
 
@@ -12,13 +12,15 @@ const routes = [
     path: '/',
     name: 'Home',
     component: Home,
-    redirect: '/login'
-  },
-  {
-    path: '/dashboard',
-    name: 'Dashboard',
-    component: BaseDashboard,
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true },
+    children: [
+      {
+        path: '/dashboard',
+        name: 'Dashboard',
+        component: Dashboard,
+        meta: { requiresAuth: true }
+      },
+    ]
   },
   {
     path: '/login',
@@ -35,11 +37,12 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
-    if (!store.getters.isLoggedIn) {
-      next('/login');
-    } else {
+    isAuthenticated().then(() => {
       next();
-    }
+    })
+    .catch(() => {
+      next('/login');
+    })
   }
   else {
     next();

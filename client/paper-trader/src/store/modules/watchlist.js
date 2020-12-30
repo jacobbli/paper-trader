@@ -2,13 +2,13 @@ import Vue from 'vue'
 
 export default {
   state: {
-    watchlist: {},
+    watchlist: [],
   },
   
   getters: {
-    displayWatchlist(state) {
+    getWatchlist(state) {
       return state.watchlist
-    }
+    },
   },
   
   mutations: {
@@ -16,12 +16,16 @@ export default {
       state.watchlist = watchList
     },
 
-    addToWatchlist(state, payload) {
-      Vue.set(state.watchlist, payload.symbol, [payload.price, payload.exchange_name])
+    ADD_WATCHED_SECURITY(state, payload) {
+      state.watchlist.push({
+        'symbol': payload.symbol,
+        'price': payload.price,
+        'exchange': payload.exchange
+      })
     },
 
-    removeFromWatchlist(state, payload) {
-      Vue.delete(state.watchlist, payload.symbol)
+    REMOVE_WATCHED_SECURITY(state, payload) {
+      Vue.delete(state.watchlist, payload.index)
     }
   },
   
@@ -31,25 +35,30 @@ export default {
     },
 
     addToWatchlist(context, payload){
-      context.dispatch('stockAlreadyInWatchlist', payload).then( result => {
-        if(result===false) {
-          context.commit('addToWatchlist', payload)
+      context.dispatch('getWatchedSecurityIndex', payload.symbol).then( securityIndex => {
+        if (securityIndex===null) {
+          context.commit('ADD_WATCHED_SECURITY', payload)
         }
       })    
     },
-    
-    stockAlreadyInWatchlist(context, payload) {
-      var security_exists = false
-      if(Object.keys(context.state.watchlist).includes(payload.symbol)) {
-        if(context.state.watchlist[payload.symbol][1] == payload.exchange_name) {
-          security_exists = true
-        }
-      }
-      return security_exists
-    },
 
     removeFromWatchlist(context,payload) {
-      return context.commit('removeFromWatchlist', payload)
+      context.dispatch('getWatchedSecurityIndex', payload.symbol).then( securityIndex => {
+        if (securityIndex!==null) {
+          payload['index'] = securityIndex
+          context.commit('REMOVE_WATCHED_SECURITY', payload)
+        }
+      })
+    },
+
+    getWatchedSecurityIndex(context, symbol) {
+      var securityIndex = null
+      context.state.watchlist.forEach( (item, index) => {
+        if(Object.values(item).includes(symbol)) {
+          securityIndex = index
+        }
+      })
+      return securityIndex
     }
   }
 };

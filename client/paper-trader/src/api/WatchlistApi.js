@@ -12,7 +12,7 @@ export function addToWatchlist(token, security, price, exchangeName){
       'exchange': exchangeName
     }
   }).then(() => {
-    store.dispatch('addToWatchlist', {symbol: security, price: price, exchange_name: exchangeName})  }, error => {
+    store.dispatch('addToWatchlist', {symbol: security, price: price, exchange: exchangeName})  }, error => {
     console.error(error);
   })
 }
@@ -28,7 +28,7 @@ export function removeSecurity(token, security, exchangeName){
       'exchange': exchangeName
     }
   }).then(() => {
-    store.dispatch('removeFromWatchlist', {symbol: security, exchange_name: exchangeName})  }, error => {
+    store.dispatch('removeFromWatchlist', {symbol: security, exchange: exchangeName})  }, error => {
     console.error(error);
   })
 }

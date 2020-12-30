@@ -1,38 +1,32 @@
 <template>
   <div class="watchlist">
-    <h2>Watchlist</h2>
-    <table>
-      <tr>
-        <th>Stock Symbol</th>
-        <th>Purchase Price</th>
-      </tr>
-      <tr v-for="(data, name) in watchlist" :key="name">
-        <td>{{name}}</td>
-        <td>${{data[0]}}</td>
-        <td><a-button type="primary" @click="buyStock(name, data[0], data[1])">Buy</a-button></td>
-        <td>
-          <a-popconfirm
-            title="Remove from watchlist?"
-            ok-text="Yes"
-            cancel-text="No"
-            @confirm="removeFromWatchlist(name, data[1])"
-            @cancel="cancel"
-          >
-            <a-button>Remove from watchlist</a-button>
-          </a-popconfirm>
-        </td>
-      </tr>
-    </table>
-    <quantity-selector 
-      style="z-index: 100"
-      v-if=showQuantitySelector
-      :stock=stockToPass
-      :price=priceToPass
-      :exchangeName=exchangeNameToPass
-      :ownedQuantity="ownedQuantity"
-      :action="action"      
-      @close=closeQuantitySelector
-    ></quantity-selector>
+    <a-table :columns='columns' :data-source="getWatchlist" rowKey='symbol'>
+      <span slot="actions" slot-scope="securityInfo">
+        <a-button type="primary" @click="placeBuyOrder(securityInfo)">Buy</a-button>
+        <a-divider type="vertical" />
+        <a-popconfirm
+          title="Remove from watchlist?"
+          ok-text="Yes"
+          cancel-text="No"
+          @confirm="removeFromWatchlist(securityInfo)"
+        >
+        <a-button class='delete-button'>
+          <svg t="1609229337944" class="delete-icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2660" width="15" height="15"><path d="M972.657609 209.348408C987.158609 209.36839 998.930114 197.571202 998.949999 182.99865 998.969882 168.426097 987.230618 156.59651 972.729617 156.576528L32.457975 155.280806C17.956974 155.260823 6.18547 167.058012 6.165585 181.630564 6.1457 196.203116 17.884965 208.032703 32.385966 208.052686L972.657609 209.348408Z" p-id="2661"></path><path d="M180.466902 992.356169 180.466902 1019.014859 206.993296 1018.74074 833.361858 1012.267947 859.348284 1011.999407 859.348284 985.883377 859.348284 289.397297C859.348284 274.824732 847.59289 263.011332 833.091874 263.011332 818.590859 263.011332 806.835465 274.824732 806.835465 289.397297L806.835465 985.883377 832.82189 959.498805 206.453329 965.971599 232.979723 992.356169 232.979723 282.67005C232.979723 268.097483 221.224329 256.284085 206.723313 256.284085 192.222298 256.284085 180.466902 268.097483 180.466902 282.67005L180.466902 992.356169Z" p-id="2662"></path><path d="M656.410257 847.079027C656.410257 861.651593 668.165651 873.464992 682.666667 873.464992 697.167682 873.464992 708.923076 861.651593 708.923076 847.079027L708.923076 372.131659C708.923076 357.559091 697.167682 345.745694 682.666667 345.745694 668.165651 345.745694 656.410257 357.559091 656.410257 372.131659L656.410257 847.079027Z" p-id="2663"></path><path d="M341.333333 847.079027C341.333333 861.651593 353.08873 873.464992 367.589743 873.464992 382.090758 873.464992 393.846155 861.651593 393.846155 847.079027L393.846155 372.131659C393.846155 357.559091 382.090758 345.745694 367.589743 345.745694 353.08873 345.745694 341.333333 357.559091 341.333333 372.131659L341.333333 847.079027Z" p-id="2664"></path><path d="M498.871795 847.079027C498.871795 861.651593 510.627189 873.464992 525.128205 873.464992 539.62922 873.464992 551.384614 861.651593 551.384614 847.079027L551.384614 372.131659C551.384614 357.559091 539.62922 345.745694 525.128205 345.745694 510.627189 345.745694 498.871795 357.559091 498.871795 372.131659L498.871795 847.079027Z" p-id="2665"></path><path d="M392.147755 116.721777C392.147755 102.063669 403.758665 90.363507 418.40134 90.363507L622.925796 90.363507C637.408947 90.363507 649.179381 102.1619 649.179381 116.549585L649.179381 171.644875 701.692203 171.644875 701.692203 116.549585C701.692203 72.986607 666.38105 37.591577 622.925796 37.591577L418.40134 37.591577C374.724427 37.591577 339.634933 72.950804 339.634933 116.721777L339.634933 165.310801 392.147755 165.310801 392.147755 116.721777Z" p-id="2666"></path></svg>
+        </a-button>
+        </a-popconfirm>
+      </span>
+    </a-table>
+    <a-modal
+      :visible='modalVisible'
+      @ok='confirmOrder()'
+      @cancel='closeQuantitySelector()'
+    >
+      <quantity-selector 
+        :ownedQuantity='ownedQuantity'
+        @changeOrderQuantity='orderQuantity = $event'
+      >
+      </quantity-selector>
+    </a-modal>
   </div>
 </template>
 
@@ -41,7 +35,30 @@
   import QuantitySelector from '../modal/QuantitySelector.vue'
   import { removeSecurity } from '../../api/WatchlistApi.js'
   import { getWatchlist } from '../../api/UsersApi.js'
+  import { buySecurity, sellSecurity } from '../../api/SecuritiesApi.js'
 
+  const columns = [
+    {
+      title: 'Symbol',
+      dataIndex: 'symbol',
+      key: 'symbol',
+    },
+    {
+      title: 'Price',
+      dataIndex: 'price',
+      key: 'price'
+    },
+    {
+      title: 'Exchange',
+      dataIndex: 'exchange',
+      key: 'exchange'
+    },
+    {
+      title: 'Actions',
+      key: 'actions',
+      scopedSlots: { customRender: 'actions' }
+    }
+  ]
   export default {
     name: 'StockWatchlist',
     components: {
@@ -50,54 +67,70 @@
 
     data() {
       return{
-        showQuantitySelector: false,
-        stockToPass: String,
-        priceToPass: Number,
-        exchangeNameToPass: String,
+        modalVisible: false,
+        modalTitle: '',
         ownedQuantity: 0,
-        action: String,
+        orderQuantity: 1,
+        orderType: '',
+        columns,
+        orderForm: new FormData()
       }
     },
 
     mounted() {
-      getWatchlist(this.accessToken)
+      getWatchlist(this.getAccessToken)
     },
 
     computed: {
-        ...mapGetters({watchlist:'displayWatchlist'}),
-        ...mapGetters(['accessToken'])
+        ...mapGetters(['getWatchlist', 'getAccessToken', 'isLoggedIn'])
     },
 
     methods: {
-      buyStock(stock, price, exchangeName) {
-        this.stockToPass = stock
-        this.priceToPass = price
-        this.exchangeNameToPass = exchangeName
-        this.action = 'buy'
+      placeBuyOrder(securityInfo) {
+        this.orderForm.append('symbol', securityInfo['symbol'])
+        this.orderForm.append('price', securityInfo['price'])
+        this.orderForm.append('exchange', securityInfo['exchange'])
+        this.ownedQuantity = securityInfo['quantity']
+        this.orderType = 'buy'
         this.openQuantitySelector()
       },
 
-      removeFromWatchlist(stock, exchangeName) {
-        removeSecurity(this.accessToken, stock, exchangeName)
+      placeSellOrder(securityInfo) {
+        this.orderForm.append('symbol', securityInfo['symbol'])
+        this.orderForm.append('price', securityInfo['price'])
+        this.orderForm.append('exchange', securityInfo['exchange'])
+        this.ownedQuantity = securityInfo['quantity']
+        this.orderType = 'sell'
+        this.openQuantitySelector()
       },
-      
+
+      confirmOrder() {
+        this.orderForm.append('quantity', this.orderQuantity)
+        if (this.orderType == 'buy') {
+          buySecurity(this.orderForm)
+        } else if (this.orderType == 'sell') {
+          sellSecurity(this.orderForm)
+        }
+        this.closeQuantitySelector()
+      },
+
       openQuantitySelector(){
-        this.showQuantitySelector = true
+        this.modalVisible = true
       },
 
       closeQuantitySelector(){
-        this.showQuantitySelector = false
+        this.modalVisible = false
       },
 
-      cancel(e){
-        console.log(e)
-        return;
-      }
+      removeFromWatchlist(securityInfo) {
+        removeSecurity(this.getAccessToken, securityInfo['symbol'], securityInfo['exchange'])
+      },
     }
   }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
+.delete-button {
+  border: none
+}
 </style>
