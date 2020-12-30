@@ -55,7 +55,7 @@ export default {
           const newQuantity = context.state.owned[securityIndex]['quantity'] + parseInt(payload.quantity)
           const totalValue = context.state.owned[securityIndex]['avg_price']*context.state.owned[securityIndex]['quantity'] + payload.price*parseInt(payload.quantity)
           const avgPrice = totalValue / newQuantity
-
+          context.dispatch('updateFunds', payload.quantity*payload.price)
           payload = {
             'index': securityIndex,
             'quantity': newQuantity,

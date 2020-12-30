@@ -50,6 +50,10 @@ export default {
         setFunds(context, funds) {
             context.commit('SET_FUNDS', funds)
         },
+        updateFunds(context, difference) {
+            const newFunds = context.state.funds - difference
+            context.commit('SET_FUNDS', newFunds)
+        },
         setCurrentUser(context, payload) {
             context.dispatch('setAccessToken', payload['access_token']);
             context.dispatch('setUsername', payload['username']);
