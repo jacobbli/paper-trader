@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import App from './App.vue';
 import store from './store/store'
-import { Button, Row, Col, Layout, Menu, Space, Popconfirm, Input, Form, Table, Divider, Card, Avatar, Modal} from 'ant-design-vue';
+import { Button, Row, Col, Layout, Menu, Space, Popconfirm, Input, InputNumber, Form, Table, Divider, Card, Avatar, Modal} from 'ant-design-vue';
 import 'ant-design-vue/dist/antd.css';
 import router from './router'
 
@@ -19,6 +19,7 @@ Vue.use(Divider)
 Vue.use(Card)
 Vue.use(Avatar)
 Vue.use(Modal)
+Vue.use(InputNumber)
 
 Vue.config.productionTip = false
 
