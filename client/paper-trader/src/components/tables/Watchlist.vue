@@ -33,9 +33,8 @@
 <script>
   import { mapGetters } from 'vuex'
   import QuantitySelector from '../modal/QuantitySelector.vue'
-  import { removeSecurity } from '../../api/WatchlistApi.js'
-  import { getWatchlist } from '../../api/UsersApi.js'
-  import { buySecurity, sellSecurity } from '../../api/SecuritiesApi.js'
+  import { getWatchlist, removeSecurity } from '../../api/WatchlistsApi.js'
+  import { buySecurity, sellSecurity } from '../../api/TradesApi.js'
 
   const columns = [
     {
@@ -60,7 +59,7 @@
     }
   ]
   export default {
-    name: 'StockWatchlist',
+    name: 'Watchlist',
     components: {
       QuantitySelector
     },

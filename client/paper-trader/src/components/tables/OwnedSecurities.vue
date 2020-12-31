@@ -2,20 +2,21 @@
   <div id="owned-stocks-table" >
     <a-table :columns='columns' :data-source='getOwnedSecurities' rowKey='symbol'>
       <span slot="avg-price" slot-scope="price">{{ price.toFixed(2)}} </span>
-      <span slot="actions" slot-scope="stockInfo">
-        <a-button type="primary" @click="placeBuyOrder(stockInfo)">Buy</a-button>
+      <span slot="actions" slot-scope="securityInfo">
+        <a-button type="primary" @click="placeBuyOrder(securityInfo)">Buy</a-button>
         <a-divider type="vertical" />
-        <a-button @click='placeSellOrder(stockInfo)'>Sell</a-button>
+        <a-button @click='placeSellOrder(securityInfo)'>Sell</a-button>
       </span>
     </a-table>
     <a-modal
       :visible='modalVisible'
       @ok='confirmOrder()'
       @cancel='closeQuantitySelector()'
+      :destroyOnClose='true'
     >
     <quantity-selector 
       :ownedQuantity='ownedQuantity'
-      @changeOrderQuantity='orderQuantity = $event'></quantity-selector>
+      @changeOrderQuantity='changeOrderQuantity($event)'></quantity-selector>
     </a-modal>
   </div>
 </template>
@@ -23,8 +24,7 @@
 <script>
   import { mapGetters } from 'vuex'
   import QuantitySelector from '../modal/QuantitySelector.vue'
-  import { getOwnedStocks } from '../../api/UsersApi.js'
-  import { buySecurity, sellSecurity } from '../../api/SecuritiesApi.js'
+  import { getOwnedStocks, buySecurity, sellSecurity } from '../../api/TradesApi.js'
 
 const columns = [
     {
@@ -33,10 +33,10 @@ const columns = [
       key: 'symbol',
     },
     {
-      title: 'Average Price',
-      dataIndex: 'avg_price',
-      key: 'averagePrice',
-      scopedSlots: { customRender: 'avg-price' }
+      title: 'Price',
+      dataIndex: 'price',
+      key: 'Price',
+      scopedSlots: { customRender: 'price' }
     },
     {
       title: 'Quantity',
@@ -55,7 +55,7 @@ const columns = [
     }
   ]
   export default {
-    name: 'StockOwned',
+    name: 'OwnedSecurities',
     components: {
       QuantitySelector
     },
@@ -81,26 +81,27 @@ const columns = [
     },
     
     methods: {
-      placeBuyOrder(stockInfo) {
-        this.orderForm.append('symbol', stockInfo['symbol'])
-        this.orderForm.append('price', stockInfo['avg_price'])
-        this.orderForm.append('exchange', stockInfo['exchange'])
-        this.ownedQuantity = stockInfo['quantity']
+      placeBuyOrder(securityInfo) {
+        this.orderForm.set('quantity', 1)
+        this.orderForm.set('symbol', securityInfo['symbol'])
+        this.orderForm.set('price', securityInfo['price'])
+        this.orderForm.set('exchange', securityInfo['exchange'])
+        this.ownedQuantity = securityInfo['quantity']
         this.orderType = 'buy'
         this.openQuantitySelector()
       },
 
-      placeSellOrder(stockInfo) {
-        this.orderForm.append('symbol', stockInfo['symbol'])
-        this.orderForm.append('price', stockInfo['avg_price'])
-        this.orderForm.append('exchange', stockInfo['exchange'])
-        this.ownedQuantity = stockInfo['quantity']
+      placeSellOrder(securityInfo) {
+        this.orderForm.set('quantity', 1)
+        this.orderForm.set('symbol', securityInfo['symbol'])
+        this.orderForm.set('price', securityInfo['price'])
+        this.orderForm.set('exchange', securityInfo['exchange'])
+        this.ownedQuantity = securityInfo['quantity']
         this.orderType = 'sell'
         this.openQuantitySelector()
       },
 
       confirmOrder() {
-        this.orderForm.append('quantity', this.orderQuantity)
         if (this.orderType == 'buy') {
           buySecurity(this.orderForm)
         } else if (this.orderType == 'sell') {
@@ -115,6 +116,10 @@ const columns = [
 
       closeQuantitySelector(){
         this.modalVisible = false
+      },
+      
+      changeOrderQuantity(event) {
+        this.orderForm.set('quantity', event)
       }
     }
   }
