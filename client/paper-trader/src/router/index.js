@@ -3,7 +3,7 @@ import VueRouter from 'vue-router'
 import Dashboard from '../views/Dashboard.vue'
 import Login from '../views/Login.vue'
 import Home from '../views/Home.vue'
-import { isAuthenticated } from '../api/AuthenticationApi.js'
+import { isAuthenticated } from '../api/UsersApi.js'
 
 Vue.use(VueRouter)
 

@@ -6,8 +6,6 @@
 </template>
 
 <script>
-  // import { buySecurity } from '../../api/SecuritiesApi.js'
-  // import { sellSecurity } from '../../api/SecuritiesApi.js'
   import { mapGetters } from 'vuex'
 
   export default {
@@ -30,34 +28,6 @@
       onChange() {
         this.$emit('changeOrderQuantity', this.quantity)
       }
-
-    //   placeOrder() {
-    //     if (this.action == 'buy') {
-    //       this.buyStock()
-    //     } else if (this.action == 'sell') {
-    //       if (this.quantity > this.ownedQuantity) {
-    //         this.oversellMessage = 'You cannot sell more than what you own!'
-    //       } else {
-    //         this.sellStock()
-    //       }
-    //     }
-    //   },
-
-    //   buyStock() {
-    //     if(this.quantity > 0) {
-    //       buySecurity(this.getAccessToken, this.stock, this.price, this.quantity, this.exchangeName)
-    //     }
-    //     this.close()
-    //   },
-
-    //   sellStock() {
-    //     if (this.quantity > 0) {
-    //       if(this.quantity <= this.ownedQuantity) {
-    //         sellSecurity(this.getAccessToken, this.stock, this.price, this.quantity, this.exchangeName)
-    //       }
-    //     }
-    //     this.close()
-    //   },
     }
   }
 </script>
