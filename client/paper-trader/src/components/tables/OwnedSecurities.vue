@@ -65,7 +65,6 @@ const columns = [
         modalVisible: false,
         modalTitle: '',
         ownedQuantity: 0,
-        orderQuantity: 1,
         orderType: '',
         columns,
         orderForm: new FormData()

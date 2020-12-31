@@ -23,7 +23,7 @@
     >
       <quantity-selector 
         :ownedQuantity='ownedQuantity'
-        @changeOrderQuantity='orderQuantity = $event'
+        @changeOrderQuantity='changeOrderQuantity($event)'
       >
       </quantity-selector>
     </a-modal>
@@ -69,7 +69,6 @@
         modalVisible: false,
         modalTitle: '',
         ownedQuantity: 0,
-        orderQuantity: 1,
         orderType: '',
         columns,
         orderForm: new FormData()
@@ -86,25 +85,26 @@
 
     methods: {
       placeBuyOrder(securityInfo) {
-        this.orderForm.append('symbol', securityInfo['symbol'])
-        this.orderForm.append('price', securityInfo['price'])
-        this.orderForm.append('exchange', securityInfo['exchange'])
+        this.orderForm.set('quantity', 1)
+        this.orderForm.set('symbol', securityInfo['symbol'])
+        this.orderForm.set('price', securityInfo['price'])
+        this.orderForm.set('exchange', securityInfo['exchange'])
         this.ownedQuantity = securityInfo['quantity']
         this.orderType = 'buy'
         this.openQuantitySelector()
       },
 
       placeSellOrder(securityInfo) {
-        this.orderForm.append('symbol', securityInfo['symbol'])
-        this.orderForm.append('price', securityInfo['price'])
-        this.orderForm.append('exchange', securityInfo['exchange'])
+        this.orderForm.set('quantity', 1)
+        this.orderForm.set('symbol', securityInfo['symbol'])
+        this.orderForm.set('price', securityInfo['price'])
+        this.orderForm.set('exchange', securityInfo['exchange'])
         this.ownedQuantity = securityInfo['quantity']
         this.orderType = 'sell'
         this.openQuantitySelector()
       },
 
       confirmOrder() {
-        this.orderForm.append('quantity', this.orderQuantity)
         if (this.orderType == 'buy') {
           buySecurity(this.orderForm)
         } else if (this.orderType == 'sell') {
@@ -124,6 +124,10 @@
       removeFromWatchlist(securityInfo) {
         removeSecurity(this.getAccessToken, securityInfo['symbol'], securityInfo['exchange'])
       },
+
+      changeOrderQuantity(event) {
+        this.orderForm.set('quantity', event)
+      }
     }
   }
 </script>
