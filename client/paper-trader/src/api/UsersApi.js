@@ -2,6 +2,7 @@ import axios from "axios";
 import router from "../router";
 import store from '../store/store.js'
 
+
 export function login(login_form) {
     axios({
       method: "POST", 
@@ -16,6 +17,7 @@ export function login(login_form) {
       console.error(error);
     })
   }
+
 
 export function isAuthenticated() {
   return new Promise( (resolve, reject) => {
@@ -40,6 +42,7 @@ export function isAuthenticated() {
     }
   })
 }
+
 
 export function logout() {
   store.dispatch('logout').then(() =>
