@@ -1,14 +1,12 @@
 import axios from "axios";
 import store from '../store/store.js'
 
-// Axios only allows request body with POST/PUT requests
-export function getOwnedStocks(access_token) {
+export function getOwnedStocks() {
   axios({
-    method: 'POST',
-    url: `${process.env.VUE_APP_API_URL}/trades/owned`,
-    data: {
-      'access_token': access_token,
-      'token_type': 'bearer'
+    method: 'GET',
+    url: `${process.env.VUE_APP_API_URL}/trades/owned-securities`,
+    headers: {
+      'Authorization': `Bearer ${store.getters.getAccessToken}`
     }
   }).then(result => {
     store.dispatch('getOwnedStocks', result.data)
@@ -21,9 +19,11 @@ export function buySecurity(orderForm){
   return new Promise( (resolve, reject) => {
     axios({
       method: 'POST',
-      url: `${process.env.VUE_APP_API_URL}/trades/bought`,
+      url: `${process.env.VUE_APP_API_URL}/trades/owned-securities`,
+      headers: {
+        'Authorization': `Bearer ${store.getters.getAccessToken}`
+      },
       data: {
-          'token': store.getters.getAccessToken,
           'symbol': orderForm.get('symbol'),
           'exchange': orderForm.get('exchange'),
           'quantity': orderForm.get('quantity'),
@@ -40,12 +40,14 @@ export function buySecurity(orderForm){
 }
 
 export function sellSecurity(orderForm){
-  return new Promise( (resolve, reject) => {
+  return new Promise((resolve, reject) => {
     axios({
-      method: 'POST',
-      url: `${process.env.VUE_APP_API_URL}/trades/sold`,
+      method: 'DELETE',
+      url: `${process.env.VUE_APP_API_URL}/trades/owned-securities`,
+      headers: {
+        'Authorization': `Bearer ${store.getters.getAccessToken}`
+      },
       data: {
-          'token': store.getters.getAccessToken,
           'symbol': orderForm.get('symbol'),
           'exchange': orderForm.get('exchange'),
           'quantity': orderForm.get('quantity'),

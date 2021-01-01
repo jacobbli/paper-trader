@@ -2,14 +2,12 @@ import axios from "axios";
 import store from '../store/store.js'
 
 
-// Axios only allows request body with POST/PUT requests
-export function getWatchlist(access_token) {
+export function getWatchlist() {
   axios({
-    method: "POST",
-    url: `${process.env.VUE_APP_API_URL}/watchlist/watched`,
-    data: {
-      'access_token': access_token,
-      'token_type': 'bearer'
+    method: 'GET',
+    url: `${process.env.VUE_APP_API_URL}/watchlists/watched-securities`,
+    headers: {
+      'Authorization': `Bearer ${store.getters.getAccessToken}`
     }
   }).then(result => {
     store.dispatch('getWatchlist', result.data)
@@ -19,12 +17,14 @@ export function getWatchlist(access_token) {
 }
 
 
-export function addToWatchlist(token, security, price, exchange){
+export function addToWatchlist(security, price, exchange){
   axios({
     method: 'POST',
-    url: `${process.env.VUE_APP_API_URL}/watchlist/watch`,
+    url: `${process.env.VUE_APP_API_URL}/watchlists/watched-securities`,
+    headers: {
+      'Authorization': `Bearer ${store.getters.getAccessToken}`
+    },
     data: {
-      'token': token,
       'symbol': security,
       'exchange': exchange
     }
@@ -36,12 +36,14 @@ export function addToWatchlist(token, security, price, exchange){
 }
 
 
-export function removeSecurity(token, security, exchange){
+export function removeFromWatchlist(security, exchange){
   axios({
-    method: 'POST',
-    url:`${process.env.VUE_APP_API_URL}/watchlist/unwatch`,
+    method: 'DELETE',
+    url:`${process.env.VUE_APP_API_URL}/watchlists/watched-securities`,
+    headers: {
+      'Authorization': `Bearer ${store.getters.getAccessToken}`
+    },
     data: {
-      'token': token,
       'symbol': security,
       'exchange': exchange
     }
