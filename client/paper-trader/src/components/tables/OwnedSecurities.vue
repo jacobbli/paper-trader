@@ -16,6 +16,7 @@
     >
     <quantity-selector 
       :ownedQuantity='ownedQuantity'
+      :orderType='orderType'
       @changeOrderQuantity='changeOrderQuantity($event)'></quantity-selector>
     </a-modal>
   </div>
