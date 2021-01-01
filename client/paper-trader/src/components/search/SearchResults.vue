@@ -1,6 +1,7 @@
 <template>
   <div id="search-results">
     <a-table :columns='columns' :data-source="getSearchResults" rowKey='symbol'>
+      <span slot="price" slot-scope="price">${{ price.toFixed(2) }}</span>
       <span slot="actions" slot-scope="securityInfo">
         <a-button type="primary" @click="placeBuyOrder(securityInfo)">Buy</a-button>
         <a-divider type="vertical" />
@@ -47,6 +48,8 @@
       title: 'Price',
       key: 'price',
       dataIndex: 'price',
+      scopedSlots: { customRender: 'price' }
+
     },
     {
       title: 'Actions',
