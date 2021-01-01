@@ -24,6 +24,7 @@
     >
       <quantity-selector 
         :ownedQuantity='ownedQuantity'
+        :orderType='orderType'
         @changeOrderQuantity='changeOrderQuantity($event)'
       >
       </quantity-selector>
@@ -124,7 +125,9 @@
       },
 
       remove(securityInfo) {
-        removeFromWatchlist(securityInfo['symbol'], securityInfo['exchange'])
+        this.orderForm.set('symbol', securityInfo['symbol'])
+        this.orderForm.set('exchange', securityInfo['exchange'])
+        removeFromWatchlist(this.orderForm)
       },
 
       changeOrderQuantity(event) {
