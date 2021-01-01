@@ -5,7 +5,7 @@
         enter-button="Search"
         size="large"
         style="width: 500px;"
-        @search="search()"
+        @search="search"
       />
     <a-modal 
       :visible="resultsVisible"
