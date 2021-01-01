@@ -50,9 +50,14 @@ export default {
     addOwnedSecurity(context, orderForm) {
       context.dispatch('getOwnedSecurityIndex', orderForm.get('symbol')).then( securityIndex => {
         if(securityIndex===null) {
-          context.commit('ADD_OWNED_SECURITY', orderForm)
+          const payload = {
+            'symbol': orderForm.get('symbol'),
+            'price': parseFloat(orderForm.get('price')),
+            'quantity': parseInt(orderForm.get('quantity')),
+            'exchange': orderForm.get('exchange')
+          }
+          context.commit('ADD_OWNED_SECURITY', payload)
         } else {
-          console.log(orderForm.get('quantity'))
           const newQuantity = context.state.ownedSecurities[securityIndex]['quantity'] + parseInt(orderForm.get('quantity'))
           context.dispatch('updateFunds', orderForm.get('quantity') * orderForm.get('price'))
 
@@ -83,7 +88,7 @@ export default {
 
     getOwnedSecurityIndex(context, symbol) {
       var securityIndex = null
-      context.state.ownedSecurities.forEach( (item, index) => {
+      context.state.ownedSecurities.forEach((item, index) => {
         if(Object.values(item).includes(symbol)) {
           securityIndex = index
         }
