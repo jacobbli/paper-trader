@@ -3,7 +3,7 @@
     <a-layout class='main-layout'>
         <a-layout-header class='header'>
           <a-row>
-            <a-col :span="4">
+            <a-col :span="5">
               <a-avatar v-if='isLoggedIn' size='large' style='backgroundColor:#1890ff'>
                 {{ this.getFirstName[0] + this.getLastName[0] }}
               </a-avatar>
@@ -16,7 +16,7 @@
                 <search-bar></search-bar>
               </div>
             </a-col>
-            <a-col :span="2" :offset='7'>
+            <a-col :span="2" :offset='6'>
               <a-menu
                 theme="dark"
                 mode="horizontal"
