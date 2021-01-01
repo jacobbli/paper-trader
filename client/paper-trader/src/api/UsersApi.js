@@ -9,7 +9,7 @@ export function login(login_form) {
       data: login_form,
       headers: {'Content-Type': 'multipart/form-data' }
     }).then(result => {
-      store.dispatch('setCurrentUser', result.data).then(() =>
+      store.dispatch('login', result.data).then(() =>
         router.push('/dashboard')
       )
     }, error => {
@@ -21,14 +21,13 @@ export function isAuthenticated() {
   return new Promise( (resolve, reject) => {
     if (store.getters.getAccessToken !== null) {
       axios({
-        method: 'POST',
+        method: 'GET',
         url:`${process.env.VUE_APP_API_URL}/users/authenticated`,
-        data: {
-          'access_token': store.getters.getAccessToken,
-          'token_type': 'bearer'
+        headers: {
+          'Authorization': `Bearer ${store.getters.getAccessToken}`
         }
       }).then(result => {
-        store.dispatch('setCurrentUser', result.data);
+        store.dispatch('authenticate', result.data);
         resolve();
       },
       () => {
