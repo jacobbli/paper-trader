@@ -25,7 +25,7 @@ export default {
     },
 
     REMOVE_WATCHED_SECURITY(state, payload) {
-      Vue.delete(state.watchlist, payload.index)
+      Vue.delete(state.watchlist, payload)
     }
   },
   
@@ -34,19 +34,23 @@ export default {
       context.commit('getWatchlist', watchList)
     },
 
-    addToWatchlist(context, payload){
-      context.dispatch('getWatchedSecurityIndex', payload.symbol).then( securityIndex => {
+    addToWatchlist(context, orderForm){
+      context.dispatch('getWatchedSecurityIndex', orderForm.get('symbol')).then( securityIndex => {
         if (securityIndex===null) {
+          const payload = {
+            'symbol': orderForm.get('symbol'),
+            'price': parseFloat(orderForm.get('price')),
+            'exchange': orderForm.get('exchange')
+          }
           context.commit('ADD_WATCHED_SECURITY', payload)
         }
       })    
     },
 
-    removeFromWatchlist(context,payload) {
-      context.dispatch('getWatchedSecurityIndex', payload.symbol).then( securityIndex => {
+    removeFromWatchlist(context,orderForm) {
+      context.dispatch('getWatchedSecurityIndex', orderForm.get('symbol')).then( securityIndex => {
         if (securityIndex!==null) {
-          payload['index'] = securityIndex
-          context.commit('REMOVE_WATCHED_SECURITY', payload)
+          context.commit('REMOVE_WATCHED_SECURITY', securityIndex)
         }
       })
     },
