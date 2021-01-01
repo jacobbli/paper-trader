@@ -3,12 +3,12 @@
     <a-row :gutter="[16,16]">
       <a-col :span="16">
         <a-card title='My Portfolio'>
-          <stock-owned></stock-owned>
+          <owned-securities></owned-securities>
         </a-card>
       </a-col>
       <a-col :span="8">
         <a-card title='My Watchlist'>
-          <stock-watchlist></stock-watchlist>
+          <watchlist></watchlist>
         </a-card>
       </a-col>
     </a-row>
@@ -16,14 +16,14 @@
 </template>
 
 <script>
-import StockWatchlist from '../components/lists/StockWatchlist.vue'
-import StockOwned from '../components/lists/StockOwned.vue'
+import Watchlist from '../components/tables/Watchlist.vue'
+import OwnedSecurities from '../components/tables/OwnedSecurities.vue'
 
 export default {
   name: 'Dashboard',
   components: {
-    StockWatchlist,
-    StockOwned,
+    Watchlist,
+    OwnedSecurities,
   },
   props: {
         

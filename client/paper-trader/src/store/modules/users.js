@@ -54,13 +54,21 @@ export default {
             const newFunds = context.state.funds - difference
             context.commit('SET_FUNDS', newFunds)
         },
-        setCurrentUser(context, payload) {
+        login(context, payload) {
             context.dispatch('setAccessToken', payload['access_token']);
             context.dispatch('setUsername', payload['username']);
             context.dispatch('setFirstName', payload['first_name']);
             context.dispatch('setLastName', payload['last_name']);
             context.dispatch('setFunds', payload['funds']);
         },
+
+        authenticate(context, payload) {
+            context.dispatch('setUsername', payload['username']);
+            context.dispatch('setFirstName', payload['first_name']);
+            context.dispatch('setLastName', payload['last_name']);
+            context.dispatch('setFunds', payload['funds']);
+        },
+
         logout(context) {
             sessionStorage.removeItem('access-token')
             context.dispatch('setAccessToken', null);

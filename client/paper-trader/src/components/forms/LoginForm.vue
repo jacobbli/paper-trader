@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import {login} from '../../api/AuthenticationApi.js'
+import {login} from '../../api/UsersApi.js'
 
 export default {
   name: 'LoginForm',

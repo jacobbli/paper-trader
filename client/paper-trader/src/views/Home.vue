@@ -3,8 +3,8 @@
     <a-layout class='main-layout'>
         <a-layout-header class='header'>
           <a-row>
-            <a-col :span="4">
-              <a-avatar size='large' style='backgroundColor:#1890ff'>
+            <a-col :span="5">
+              <a-avatar v-if='isLoggedIn' size='large' style='backgroundColor:#1890ff'>
                 {{ this.getFirstName[0] + this.getLastName[0] }}
               </a-avatar>
               <span style='color:white;'>
@@ -16,7 +16,7 @@
                 <search-bar></search-bar>
               </div>
             </a-col>
-            <a-col :span="2" :offset='7'>
+            <a-col :span="2" :offset='6'>
               <a-menu
                 theme="dark"
                 mode="horizontal"
@@ -52,8 +52,8 @@
 
 <script>
   import { mapGetters } from 'vuex'
-  import { logout } from '../api/AuthenticationApi.js'
-  import SearchBar from '../components/tools/SearchBar.vue'
+  import { logout } from '../api/UsersApi.js'
+  import SearchBar from '../components/search/SearchBar.vue'
 
   export default {
     name: 'Home',
