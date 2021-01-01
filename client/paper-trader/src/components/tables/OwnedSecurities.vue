@@ -1,7 +1,7 @@
 <template>
   <div id="owned-stocks-table" >
     <a-table :columns='columns' :data-source='getOwnedSecurities' rowKey='symbol'>
-      <span slot="avg-price" slot-scope="price">{{ price.toFixed(2)}} </span>
+      <span slot="price" slot-scope="price">${{ price.toFixed(2) }}</span>
       <span slot="actions" slot-scope="securityInfo">
         <a-button type="primary" @click="placeBuyOrder(securityInfo)">Buy</a-button>
         <a-divider type="vertical" />
