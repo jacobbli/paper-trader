@@ -1,5 +1,7 @@
 import axios from "axios";
 import store from '../store/store.js'
+import { logout } from '../api/UsersApi.js'
+
 
 export function getOwnedStocks() {
   axios({
@@ -12,8 +14,12 @@ export function getOwnedStocks() {
     store.dispatch('getOwnedStocks', result.data)
   }, error => {
     console.error(error);
+    if (error.response.status == 401) {
+      logout()
+    }
   })
 }
+
 
 export function buySecurity(orderForm){
   return new Promise( (resolve, reject) => {
@@ -34,6 +40,9 @@ export function buySecurity(orderForm){
       resolve()
     }, error => {
       console.error(error);
+      if (error.response.status == 401) {
+        logout()
+      }
       reject()
     })
   })
@@ -59,6 +68,9 @@ export function sellSecurity(orderForm){
       resolve()
     }, error => {
       console.error(error);
+      if (error.response.status == 401) {
+        logout()
+      }
       reject()
     })
   })

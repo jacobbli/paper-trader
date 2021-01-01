@@ -1,5 +1,6 @@
 import axios from "axios";
 import store from '../store/store.js'
+import { logout } from '../api/UsersApi.js'
 
 
 export function getWatchlist() {
@@ -13,11 +14,14 @@ export function getWatchlist() {
     store.dispatch('getWatchlist', result.data)
   }, error => {
     console.error(error);
+    if (error.response.status == 401) {
+      logout()
+    }
   })
 }
 
 
-export function addToWatchlist(security, price, exchange){
+export function addToWatchlist(orderForm){
   axios({
     method: 'POST',
     url: `${process.env.VUE_APP_API_URL}/watchlists/watched-securities`,
@@ -25,18 +29,21 @@ export function addToWatchlist(security, price, exchange){
       'Authorization': `Bearer ${store.getters.getAccessToken}`
     },
     data: {
-      'symbol': security,
-      'exchange': exchange
+      'symbol': orderForm.get('symbol'),
+      'exchange': orderForm.get('exchange')
     }
   }).then(() => {
-    store.dispatch('addToWatchlist', {symbol: security, price: price, exchange: exchange})
+    store.dispatch('addToWatchlist', orderForm)
   }, error => {
     console.error(error);
+    if (error.response.status == 401) {
+      logout()
+    }
   })
 }
 
 
-export function removeFromWatchlist(security, exchange){
+export function removeFromWatchlist(orderForm){
   axios({
     method: 'DELETE',
     url:`${process.env.VUE_APP_API_URL}/watchlists/watched-securities`,
@@ -44,12 +51,15 @@ export function removeFromWatchlist(security, exchange){
       'Authorization': `Bearer ${store.getters.getAccessToken}`
     },
     data: {
-      'symbol': security,
-      'exchange': exchange
+      'symbol': orderForm.get('symbol'),
+      'exchange': orderForm.get('exchange')
     }
   }).then(() => {
-    store.dispatch('removeFromWatchlist', {symbol: security, exchange: exchange})
+    store.dispatch('removeFromWatchlist', orderForm)
   }, error => {
     console.error(error);
+    if (error.response.status == 401) {
+      logout()
+    }
   })
 }
