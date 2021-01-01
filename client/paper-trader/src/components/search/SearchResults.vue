@@ -15,6 +15,7 @@
     >
       <quantity-selector 
         :ownedQuantity='ownedQuantity'
+        :orderType='orderType'
         @changeOrderQuantity='changeOrderQuantity($event)'
       >
       </quantity-selector>
@@ -123,7 +124,10 @@
       },
 
       addToWatchlist(securityInfo) {
-        addToWatchlist(this.getAccessToken, securityInfo['symbol'], securityInfo['price'], securityInfo['exchange'])
+        this.orderForm.set('symbol', securityInfo['symbol'])
+        this.orderForm.set('price', securityInfo['price'])
+        this.orderForm.set('exchange', securityInfo['exchange'])
+        addToWatchlist(this.orderForm)
       },
 
       changeOrderQuantity(event) {
