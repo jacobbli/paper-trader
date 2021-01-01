@@ -1,6 +1,6 @@
 <template>
   <div id='quantity-selector'>
-    <a-input-number id="quantity-input" v-model='quantity' :min="1" :max='ownedQuantity' @change='onChange'/>
+    <a-input-number id="quantity-input" v-model='quantity' :min="1" :max='maxQuantity()' @change='onChange'/>
     Currently owned: {{ this.ownedQuantity }}
   </div>
 </template>
@@ -12,11 +12,13 @@
     name: 'QuantitySelector',
     props:{
       ownedQuantity: Number,
+      orderType: String
     },
 
     data() {
       return{
         quantity: 1,
+
       }
     },
 
@@ -27,7 +29,9 @@
     methods: {
       onChange() {
         this.$emit('changeOrderQuantity', this.quantity)
-      }
+      },
+      maxQuantity() {
+        return (this.orderType == 'buy' ? Infinity : this.ownedQuantity)}
     }
   }
 </script>
