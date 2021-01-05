@@ -9,6 +9,7 @@ export default {
 
     getters: {
         getFunds: state => state.funds,
+        getUsername: state => state.username,
         getFirstName: state => state.firstName,
         getLastName: state => state.lastName,
         getAccessToken: state => { return (state.accessToken == 'null'? null : state.accessToken) },
