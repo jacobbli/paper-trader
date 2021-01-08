@@ -3,93 +3,92 @@ import router from "../router";
 import store from '../store/store.js'
 
 
-export function login(login_form) {
-    axios({
+export async function login(login_form) {
+  try {
+    let response = await axios({
       method: "POST", 
       url: `${process.env.VUE_APP_API_URL}/users/token`,
       data: login_form,
       headers: {'Content-Type': 'multipart/form-data' },
       withCredentials: true
-    }).then(result => {
-      store.dispatch('login', result.data).then(() =>
-        router.push('/dashboard')
-      )
-    }, error => {
-      console.error(error);
     })
+    await store.dispatch('login', response.data)
+    router.push('/dashboard')
+    return Promise.resolve('Login successful')
+  } catch(err) {
+    return Promise.reject('Login failed')
   }
+}
 
 
-export function isAuthenticated() {
-  return new Promise((resolve, reject) => {
-    if (store.getters.getAccessToken !== null) {
-      axios({
+export async function isAuthenticated() {
+  if (store.getters.getAccessToken !== null) {
+    try {
+      let response = await axios({
         method: 'GET',
         url:`${process.env.VUE_APP_API_URL}/users/authenticated`,
         headers: {
           'Authorization': `Bearer ${store.getters.getAccessToken}`
         }
-      }).then(
-        result => {
-          store.dispatch('authenticate', result.data);
-          resolve('User is authenticated');
-        },
-        error => {
-          if (error.response.status == 401) {
-            requestTokens().then(
-              () => {
-                axios({
-                  method: 'GET',
-                  url:`${process.env.VUE_APP_API_URL}/users/authenticated`,
-                  headers: {
-                    'Authorization': `Bearer ${store.getters.getAccessToken}`
-                  }
-                }).then(
-                  result => {
-                    store.dispatch('authenticate', result.data);
-                    resolve('User is authenticated');
-                  },
-                  () => {
-                    reject('User is not authenticated')
-                  })
-              },
-              () => {
-                reject('User is not authenticated')
-              }
-            )
-          } else {
-            reject('User is not authenticated')
+      })
+      store.dispatch('authenticate', response.data);
+      return Promise.resolve('User is authenticated')
+    } catch(err) {
+      try {
+        await requestTokens();
+        await axios({
+          method: 'GET',
+          url:`${process.env.VUE_APP_API_URL}/users/authenticated`,
+          withCredentials: true,
+          headers: {
+            'Authorization': `Bearer ${store.getters.getAccessToken}`
           }
-        }
-      )
-    } else {
-      requestTokens()
-        .then(
-          () => {
-            axios({
-              method: 'GET',
-              url:`${process.env.VUE_APP_API_URL}/users/authenticated`,
-              withCredentials: true
-            }).then(
-              () => {
-                resolve('User is authenticated');
-              },
-              () => {
-                reject('User is not authenticated');
-              }
-            )
-          },
-          () => {
-            reject('User is not authenticated')
-          }
-        )
+        });
+        return Promise.resolve('User is authenticated')
+      } catch(err) {
+        return Promise.reject('User is not authenticated')
       }
     }
-  )
+  } else {
+    try{
+      await requestTokens()
+      await axios({
+        method: 'GET',
+        url:`${process.env.VUE_APP_API_URL}/users/authenticated`,
+        withCredentials: true
+      })
+      return Promise.resolve('User is authenticated')
+    } catch(err) {
+      return Promise.reject('User is not authenticated')
+    }
+  }
+}
+  
+
+export async function requestTokens() {
+  try{
+    let response = await axios({
+      method: "POST", 
+      url: `${process.env.VUE_APP_API_URL}/users/refresh-token`,
+      withCredentials: true
+    })
+    store.dispatch('login', response.data)
+    return Promise.resolve('Refreshed tokens')
+  } catch(err) {
+    return Promise.reject('Failed to refresh tokens')
+  }
 }
 
 
 export function logout() {
+  axios({
+    method: 'PATCH',
+    url:`${process.env.VUE_APP_API_URL}/users/logout`,
+    data: {
+      'username': store.getters.getUsername
+    },
+    withCredentials: true
+  })
   store.dispatch('logout').then(() =>
     router.push('/login')
   )
@@ -99,27 +98,5 @@ export function logout() {
 export function forceLogout() {
   store.dispatch('logout').then(() =>
     router.push('/login')
-  )
-}
-
-
-export function requestTokens() {
-  return new Promise((resolve, reject) => {
-    axios({
-      method: "POST", 
-      url: `${process.env.VUE_APP_API_URL}/users/refresh-token`,
-      withCredentials: true
-    })
-      .then(
-        result => {
-          store.dispatch('login', result.data).then(() => 
-            resolve('Obtained new tokens')
-          )
-        }, 
-        () => {
-          reject('Authentication failed')
-        }
-      )
-    }
   )
 }
