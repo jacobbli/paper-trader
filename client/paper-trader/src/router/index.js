@@ -26,6 +26,7 @@ const routes = [
     path: '/login',
     name: 'Login',
     component: Login,
+    meta: { requiresGuest: true }
   }
 ]
 
@@ -37,12 +38,22 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
-    isAuthenticated().then(() => {
-      next();
-    })
-    .catch(() => {
-      next('/login');
-    })
+    isAuthenticated()
+      .then(() => {
+        next();
+      })
+      .catch(() => {
+        next('/login');
+      })
+  }
+  else if (to.matched.some(record => record.meta.requiresGuest)) {
+    isAuthenticated()
+      .then(() => {
+        next('/dashboard');
+      })
+      .catch(() => {
+        next();
+      })
   }
   else {
     next();
