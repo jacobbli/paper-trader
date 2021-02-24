@@ -49,11 +49,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-.login-card {
-  margin-top: 50%;
-  border-radius: 25px;
-  border-style: outset;
-}
-</style>
