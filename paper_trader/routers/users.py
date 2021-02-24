@@ -88,7 +88,8 @@ async def is_authenticated(current_user = Depends(get_current_user)):
         'last_name': current_user['last_name'],
         'funds': float(current_user['current_funds'])
     }
-    return JSONResponse(content=content)
+    response = JSONResponse(content=content)
+    return response
 
 
 @router.patch('/users/logout')
