@@ -1,0 +1,11 @@
+@startuml Paper Trader
+class User {
+    fname: String
+    lname: String
+    username: String
+    email: String
+    funds: Float
+    watchlist: String[]
+    owned_stocks: String[]
+}
+@enduml

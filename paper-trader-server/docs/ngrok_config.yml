@@ -1,0 +1,6 @@
+authtoken: 1gkUwMpfGOIuPuzySvYH8IMABGZ_3KyhycAwZK3qN66jEEJdp
+tunnels:
+  client:
+    proto: http
+    addr: 8080
+    host_header: localhost:8080
